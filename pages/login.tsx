@@ -1,18 +1,20 @@
-import { FC, useState } from "react";
-import LoginForm from "./components/forms/LoginForm";
-import RegisterForm from "./components/forms/RegisterForm";
+import { ReactElement } from "react";
+import LoginForm from "@/components/forms/LoginForm";
+import RegisterForm from "@/components/forms/RegisterForm";
 import { useAppSelector } from "@/hooks/useRedux";
 
-interface loginProps {}
-
-const Login: FC<loginProps> = ({}) => {
+const Login = ({}) => {
   const { formState } = useAppSelector((state) => state.formState);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
       {formState === "login" ? <LoginForm /> : <RegisterForm />}
     </div>
   );
+};
+
+Login.getLayout = function getLayout(page: ReactElement) {
+  return <>{page}</>;
 };
 
 export default Login;

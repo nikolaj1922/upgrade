@@ -9,14 +9,14 @@ export const formStateSlice = createSlice({
   name: "formState",
   initialState,
   reducers: {
-    setLogin: (state) => {
+    setLoginForm: (state) => {
       state.formState = "login";
     },
-    setRegister: (state) => {
+    setRegisterForm: (state) => {
       state.formState = "register";
     },
   },
 });
 
-export const { setLogin, setRegister } = formStateSlice.actions;
+export const { setLoginForm, setRegisterForm } = formStateSlice.actions;
 export default formStateSlice.reducer;

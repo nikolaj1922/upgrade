@@ -1,25 +1,26 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FC } from "react";
 import { useForm } from "react-hook-form";
-import { FormType } from "@/types/types";
 import Image from "next/image";
 import logo from "@/public/logo.png";
 import useAuth from "@/hooks/useAuth";
 import Circular from "../ui/CircularProgress";
 import Button from "../ui/Button";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "@/hooks/useRedux";
-import { setRegister } from "@/redux/slices/formStateSlice";
+import { setLoginForm } from "@/redux/slices/formStateSlice";
 
 interface LoginFormProps {}
 
 type FormValues = {
   email: string;
   password: string;
+  name: string;
 };
 
-const LoginForm: FC<LoginFormProps> = () => {
-  const { signIn, isLoading } = useAuth();
+const RegisterForm: FC<LoginFormProps> = ({}) => {
+  const { signUp, isLoading } = useAuth();
   const dispatch = useAppDispatch();
+
   const {
     register,
     handleSubmit,
@@ -27,12 +28,12 @@ const LoginForm: FC<LoginFormProps> = () => {
   } = useForm<FormValues>();
 
   const onSubmit = (data: FormValues) => {
-    signIn(data.email, data.password);
+    signUp(data.email, data.password, data.name);
   };
 
   return (
     <form
-      className="bg-neutral-100 max-w-sm w-3/4 flex flex-col space-y-6 p-8 rounded shadow-md relative"
+      className="bg-neutral-100 w-[360px] flex flex-col space-y-6 p-8 rounded shadow-md relative"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
@@ -42,7 +43,26 @@ const LoginForm: FC<LoginFormProps> = () => {
       <div className="flex flex-col space-y-4">
         <div>
           <div className="login-input-group">
-            <label htmlFor="name">E-mail</label>
+            <label htmlFor="name">Имя</label>
+            <input
+              {...register("name", {
+                required: "Обязательное поле",
+                minLength: {
+                  value: 3,
+                  message: "Минимальная длина 3 символа",
+                },
+              })}
+              type="email"
+              id="name"
+              className="login-input"
+              placeholder="Ваше имя"
+            />
+          </div>
+          <p className="text-xs text-red-500">{errors.name?.message}</p>
+        </div>
+        <div>
+          <div className="login-input-group">
+            <label htmlFor="email">E-mail</label>
             <input
               {...register("email", {
                 required: "Обязательное поле",
@@ -52,7 +72,7 @@ const LoginForm: FC<LoginFormProps> = () => {
                 },
               })}
               type="email"
-              id="name"
+              id="email"
               className="login-input"
               placeholder="example@mail.ru"
             />
@@ -66,8 +86,8 @@ const LoginForm: FC<LoginFormProps> = () => {
               {...register("password", {
                 required: "Введите пароль",
                 minLength: {
-                  value: 4,
-                  message: "Минимальная длина 4 символа",
+                  value: 6,
+                  message: "Минимальная длина 6 символов",
                 },
               })}
               type="password"
@@ -81,18 +101,18 @@ const LoginForm: FC<LoginFormProps> = () => {
       </div>
       <div className="flex justify-center items-center space-x-6 ml-14">
         <Button className="leading-4 sm:leading-6">
-          {isLoading ? <Circular /> : "Открыть смену"}
+          {isLoading ? <Circular /> : "Регистрация"}
         </Button>
         <button
           className="hover:bg-gray-200 p-2.5 rounded-full transition duration-200 ease-out"
-          onClick={() => dispatch(setRegister())}
+          onClick={() => dispatch(setLoginForm())}
           type="button"
         >
-          <PersonAddIcon className="text-gray-800" />
+          <ArrowBackIcon className="text-gray-800" />
         </button>
       </div>
     </form>
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
