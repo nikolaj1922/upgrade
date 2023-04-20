@@ -1,31 +1,88 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import {
   CurrencyDollarIcon,
   BanknotesIcon,
   ScissorsIcon,
   ShoppingBagIcon,
   TagIcon,
-  ArchiveBoxIcon,
-  PencilIcon,
+  CalendarDaysIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Menu, MenuItem } from "@mui/material";
+import { updateDoc, doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import Avatar from "@mui/material/Avatar";
 import SidebarLink from "./SidebarLink";
 import Button from "./ui/Button";
 import useAuth from "@/hooks/useAuth";
+import Circular from "./ui/CircularProgress";
+import { toast } from "react-hot-toast";
+import { FirebaseError } from "firebase/app";
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
+import { IAdmin } from "@/types/types";
 
 interface SidebarProps {}
 
 const Sidebar: FC<SidebarProps> = ({}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const { logout, admin } = useAuth();
+  const { logout, admin, isLoading } = useAuth();
+  const [isChangeName, setIsChangeName] = useState<boolean>(false);
   const isMenuOpen = Boolean(anchorEl);
+  const [currentAdminData, setCurrentAdminData] = useState<IAdmin | null>(null);
+  const [currentName, setCurrentName] = useState<string>("");
+  const [editedNameIsLoading, setEditedNameIsLoading] =
+    useState<boolean>(false);
+  const inputChangeNameRef = useRef<HTMLInputElement | null>(null);
+  const buttonChangeNameRef = useRef<HTMLButtonElement | null>(null);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  useEffect(
+    () =>
+      onSnapshot(doc(db, "admins", admin?.uid!), (snapshot) => {
+        const data = snapshot.data();
+        setCurrentAdminData(data as IAdmin);
+        setCurrentName(data?.name);
+      }),
+    [db, admin]
+  );
+
+  const handleClickOutside = () => {
+    setIsChangeName(false), setCurrentName(currentAdminData?.name!);
+  };
+  useOnClickOutside(
+    inputChangeNameRef,
+    () => handleClickOutside(),
+    buttonChangeNameRef
+  );
+
+  const handleCloseMenuClick = () => setAnchorEl(null);
+  const handleOpenMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(e.currentTarget);
   };
-  const handleClose = () => {
+  const handleMenuChangeName = () => {
+    setIsChangeName(true);
     setAnchorEl(null);
+  };
+
+  const handleSaveEditedName = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+      if (currentName?.trim().length! < 3)
+        throw new Error("Минимальная длина 3 символа ");
+      setEditedNameIsLoading(true);
+      await updateDoc(doc(db, "admins", admin?.uid as string), {
+        name: currentName,
+      });
+      toast.success("Имя изменено.");
+      setIsChangeName(false);
+    } catch (err: any) {
+      if (err instanceof FirebaseError) {
+        toast.error("Не удалось изменить имя.");
+        return;
+      }
+      toast.error(err.message);
+    } finally {
+      setEditedNameIsLoading(false);
+    }
   };
 
   return (
@@ -35,15 +92,45 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           // src="../public/avatar-filler.png"
           alt="Admin photo"
           sx={{ width: 56, height: 56 }}
-          onClick={handleClick}
+          onClick={handleOpenMenuClick}
           className="cursor-pointer mb-2"
         />
-        <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleClose}>
-          <MenuItem onClick={handleClose}>Сменить фото</MenuItem>
+        <Menu
+          anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={handleCloseMenuClick}
+        >
+          <MenuItem onClick={handleMenuChangeName}>Изменить имя</MenuItem>
+          <MenuItem onClick={handleCloseMenuClick}>Сменить фото</MenuItem>
         </Menu>
-        <div className="flex justify-center items-center relative">
-          <h1>Имя</h1>
-          <PencilIcon className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 absolute -right-6 transition duration-150" />
+        <div className="flex justify-center items-center">
+          {isChangeName ? (
+            <form className="pl-4 relative" onSubmit={handleSaveEditedName}>
+              <input
+                ref={inputChangeNameRef}
+                type="text"
+                className="pl-2 w-3/4 rounded focus:outline-none"
+                autoFocus
+                onChange={(e) => {
+                  setCurrentName(e.target.value);
+                }}
+                value={currentName}
+              />
+              {editedNameIsLoading ? (
+                <Circular size={16} className="absolute right-3 top-1" />
+              ) : (
+                <button
+                  type="submit"
+                  onClick={handleSaveEditedName}
+                  ref={buttonChangeNameRef}
+                >
+                  <CheckCircleIcon className="w-6 h-6 text-green-500 cursor-pointer hover:text-green-600 absolute right-3 top-0 transition duration-150" />
+                </button>
+              )}
+            </form>
+          ) : (
+            <h1>{currentAdminData?.name}</h1>
+          )}
         </div>
       </div>
       <div className="flex flex-col space-y-3 mb-16">
@@ -56,10 +143,14 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           path="/salary"
           Icon={CurrencyDollarIcon}
         />
-        <SidebarLink title="Архив смен" path="/salary" Icon={ArchiveBoxIcon} />
+        <SidebarLink
+          title="Архив смен"
+          path="/salary"
+          Icon={CalendarDaysIcon}
+        />
       </div>
-      <Button className="md:w-[160px]" type="button" onClick={logout}>
-        Закрыть смену
+      <Button type="button" onClick={logout}>
+        {isLoading ? <Circular /> : "Закрыть смену"}
       </Button>
     </div>
   );

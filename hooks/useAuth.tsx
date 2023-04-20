@@ -15,16 +15,18 @@ import {
   useState,
   FC,
 } from "react";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setLoginForm } from "@/redux/slices/formStateSlice";
 import { FirebaseError } from "firebase/app";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { IAdmin } from "@/types/types";
 
 export interface IAuth {
-  admin: User | null;
+  admin: IAdmin | null;
   signUp: (email: string, password: string, username: string) => Promise<void>;
-  signIn: (email: string, password: string) => void;
+  signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
 }
@@ -37,8 +39,10 @@ const AuthContext = createContext<IAuth>({
   isLoading: false,
 });
 
+
+
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [admin, setAdmin] = useState<User | null>(null);
+  const [admin, setAdmin] = useState<IAdmin | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const dispatch = useAppDispatch();
@@ -46,9 +50,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(
     () =>
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, async (user) => {
         if (user) {
-          setAdmin(user);
+          const adminDoc = await getDoc(doc(db, "admins", user.uid));
+          setAdmin(adminDoc.data() as IAdmin);
           router.push("/");
         } else {
           setAdmin(null);
@@ -63,11 +68,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const signUp = async (email: string, password: string, name: string) => {
     try {
       setIsLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
+      const { user } = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
+      await setDoc(doc(db, "admins", user.uid), {
+        uid: user.uid,
+        name,
+      });
       dispatch(setLoginForm());
       toast.success("Администратор создан!", {
         duration: 4500,
@@ -84,58 +93,42 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             duration: 4500,
           });
         }
+        if (err.code === "auth/email-already-in-use") {
+          toast.error("Этот e-mail уже занят. Используйте другой.", {
+            duration: 4500,
+          });
+        }
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // const signIn = async (email: string, password: string) => {
-  //   try {
-  //     setIsLoading(true);
-  //     const userCredential = await signInWithEmailAndPassword(
-  //       auth,
-  //       email,
-  //       password
-  //     );
-  //     setAdmin(userCredential.user);
-  //     router.push("/");
-  //   } catch (err) {
-  //     toast.error("Неверный e-mail или пароль.", {
-  //       duration: 4500,
-  //     });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  const signIn = (email: string, password: string) => {
-    setIsLoading(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        setAdmin(userCredential.user);
-        router.push("/");
-      })
-      .catch((err) => {
-        if (err instanceof FirebaseError) {
-          if (err.code === "auth/invalid-email") {
-            toast.error("Введите корректный e-mail.", {
-              duration: 4500,
-            });
-            return;
-          }
-          if (err.code === "auth/network-request-failed") {
-            toast.error("Проблемы с соединением. Попробуйте еще раз.", {
-              duration: 4500,
-            });
-            return;
-          }
-          toast.error("Неверный e-mail или пароль.", {
+  const signIn = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code === "auth/invalid-email") {
+          toast.error("Введите корректный e-mail.", {
             duration: 4500,
           });
+          return;
         }
-      })
-      .finally(() => setIsLoading(false));
+        if (err.code === "auth/network-request-failed") {
+          toast.error("Проблемы с соединением. Попробуйте еще раз.", {
+            duration: 4500,
+          });
+          return;
+        }
+        toast.error("Неверный e-mail или пароль.", {
+          duration: 4500,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = async () => {
@@ -160,7 +153,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       signUp,
       isLoading,
     }),
-    [isLoading, admin]
+    [isLoading, admin, db]
   );
 
   return (

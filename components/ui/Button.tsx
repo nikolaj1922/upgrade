@@ -13,7 +13,7 @@ const Button: FC<ButtonProps> = ({
 }) => {
   return (
     <button
-      className={`relative w-[150px] md:w-[200px] sm:px-4 py-3 font-medium text-white transition duration-300 bg-rose-400 rounded-md hover:bg-rose-500 ease disabled:bg-rose-500 disabled:pointer-events-none ${className}`}
+      className={`relative w-[150px] md:w-[160px] sm:px-4 py-3 font-medium text-white transition duration-300 bg-rose-400 rounded-md hover:bg-rose-500 ease disabled:bg-rose-500 disabled:pointer-events-none ${className}`}
       disabled={isLoading}
       onClick={onClick}
     >
