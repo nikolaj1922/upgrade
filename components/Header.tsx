@@ -1,14 +1,18 @@
-import { FC } from "react";
+import { FC, AllHTMLAttributes } from "react";
 
-interface HeaderProps {
+interface HeaderProps extends AllHTMLAttributes<HTMLHeadingElement> {
   header: string;
 }
 
-const MainHeader: FC<HeaderProps> = ({ header }) => {
+const MainHeader: FC<HeaderProps> = ({ header, className }) => {
   return (
-    <h1 className="text-5xl font-bold border-b border-zinc-300 pb-3">
-      {header}
-    </h1>
+    <div>
+      <h1
+        className={`text-5xl font-bold border-b border-zinc-300 pb-3 ${className}`}
+      >
+        {header}
+      </h1>
+    </div>
   );
 };
 

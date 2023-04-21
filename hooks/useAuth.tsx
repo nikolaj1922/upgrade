@@ -3,7 +3,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  User,
 } from "firebase/auth";
 import { useRouter } from "next/router";
 import {
@@ -16,10 +15,15 @@ import {
   FC,
 } from "react";
 import { auth, db } from "../lib/firebase";
-import { useAppDispatch } from "@/hooks/useRedux";
-import { setLoginForm } from "@/redux/slices/formStateSlice";
 import { FirebaseError } from "firebase/app";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import toast from "react-hot-toast";
 import { IAdmin } from "@/types/types";
 
@@ -39,13 +43,10 @@ const AuthContext = createContext<IAuth>({
   isLoading: false,
 });
 
-
-
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [admin, setAdmin] = useState<IAdmin | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
-  const dispatch = useAppDispatch();
   const router = useRouter();
 
   useEffect(
@@ -77,7 +78,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         uid: user.uid,
         name,
       });
-      dispatch(setLoginForm());
       toast.success("Администратор создан!", {
         duration: 4500,
       });
@@ -107,7 +107,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const docId = await addDoc(collection(db, "work shifts"), {
+        admin: user.uid,
+        visits: [],
+        sales: [],
+        timestamp: serverTimestamp(),
+      });
+      localStorage.setItem("shiftId", docId.id);
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-email") {
@@ -136,6 +143,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       setIsLoading(true);
       await signOut(auth);
       setAdmin(null);
+      localStorage.removeItem("shiftId");
     } catch (err) {
       toast.error("Проблемы с соединением. Попробуйте еще раз.", {
         duration: 4500,

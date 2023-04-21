@@ -11,15 +11,16 @@ import {
 import { Menu, MenuItem } from "@mui/material";
 import { updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { toast } from "react-hot-toast";
+import { FirebaseError } from "firebase/app";
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
+import { IAdmin } from "@/types/types";
+import { setAvatar, deleteAvatar } from "@/lib/utils";
 import Avatar from "@mui/material/Avatar";
 import SidebarLink from "./SidebarLink";
 import Button from "./ui/Button";
 import useAuth from "@/hooks/useAuth";
 import Circular from "./ui/CircularProgress";
-import { toast } from "react-hot-toast";
-import { FirebaseError } from "firebase/app";
-import { useOnClickOutside } from "@/hooks/useOnClickOutside";
-import { IAdmin } from "@/types/types";
 
 interface SidebarProps {}
 
@@ -34,16 +35,20 @@ const Sidebar: FC<SidebarProps> = ({}) => {
     useState<boolean>(false);
   const inputChangeNameRef = useRef<HTMLInputElement | null>(null);
   const buttonChangeNameRef = useRef<HTMLButtonElement | null>(null);
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(
-    () =>
-      onSnapshot(doc(db, "admins", admin?.uid!), (snapshot) => {
+  useEffect(() => {
+    const adminDataSubscribe = () => {
+      if (!admin) return;
+      onSnapshot(doc(db, "admins", admin?.uid), (snapshot) => {
         const data = snapshot.data();
         setCurrentAdminData(data as IAdmin);
         setCurrentName(data?.name);
-      }),
-    [db, admin]
-  );
+      });
+    };
+
+    return () => adminDataSubscribe();
+  }, [db]);
 
   const handleClickOutside = () => {
     setIsChangeName(false), setCurrentName(currentAdminData?.name!);
@@ -85,13 +90,35 @@ const Sidebar: FC<SidebarProps> = ({}) => {
     }
   };
 
+  const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    e.target.value = "";
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (readerEvent) => {
+      setAvatar(readerEvent.target?.result as string, admin?.uid!);
+    };
+
+    handleCloseMenuClick();
+    setTimeout(() => {
+      toast.success("Фото изменено.");
+    }, 2000);
+  };
+
+  const handleDeleteAvatar = async () => {
+    deleteAvatar(admin?.uid!);
+    handleCloseMenuClick();
+  };
+
   return (
-    <div className="min-w-[180px] w-1/4 bg-zinc-200 opacity-[97%] rounded-md pt-8 flex flex-col justify-start items-center relative">
-      <div className="flex flex-col items-center mb-8">
+    <div className="min-w-[180px] w-1/4 bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative">
+      <div className="flex flex-col items-center mb-4">
         <Avatar
-          // src="../public/avatar-filler.png"
+          src={currentAdminData?.avatarUrl}
           alt="Admin photo"
-          sx={{ width: 56, height: 56 }}
+          sx={{ width: 85, height: 85 }}
           onClick={handleOpenMenuClick}
           className="cursor-pointer mb-2"
         />
@@ -101,7 +128,21 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           onClose={handleCloseMenuClick}
         >
           <MenuItem onClick={handleMenuChangeName}>Изменить имя</MenuItem>
-          <MenuItem onClick={handleCloseMenuClick}>Сменить фото</MenuItem>
+          <MenuItem>
+            <span onClick={() => inputFileRef.current?.click()}>
+              Сменить фото
+            </span>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              ref={inputFileRef}
+              onChange={handleChangeAvatar}
+            />
+          </MenuItem>
+          {currentAdminData?.avatarUrl && (
+            <MenuItem onClick={handleDeleteAvatar}>Удалить фото</MenuItem>
+          )}
         </Menu>
         <div className="flex justify-center items-center">
           {isChangeName ? (

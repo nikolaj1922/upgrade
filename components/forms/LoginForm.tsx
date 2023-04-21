@@ -8,6 +8,8 @@ import Button from "../ui/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setRegisterForm } from "@/redux/slices/formStateSlice";
+import { db } from "@/lib/firebase";
+import { doc, addDoc, collection } from "firebase/firestore";
 
 interface LoginFormProps {}
 

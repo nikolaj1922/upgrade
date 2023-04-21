@@ -35,5 +35,5 @@ export const useOnClickOutside = <
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
     };
-  }, [firstRef, , secondRef, handler]);
+  }, [firstRef, secondRef, handler]);
 };

@@ -7,9 +7,8 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        gradient:
-          "linear-gradient(to bottom,rgba(20,20,20,.40) 0, rgba(20,20,20,.40) 100%);",
+      opacity: {
+        97: ".97",
       },
     },
   },
