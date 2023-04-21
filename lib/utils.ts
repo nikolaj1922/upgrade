@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { DocumentData, doc, updateDoc } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import {
   getDownloadURL,
@@ -7,6 +7,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { toast } from "react-hot-toast";
+import { IVisits } from "@/types/types";
 
 export const setAvatar = (file: string, adminUid: string) => {
   const avatarRef = ref(storage, `admins/${adminUid}/avatar`);
@@ -38,3 +39,24 @@ export const convertDataToTime = (data: string) => {
 };
 
 export const getUniqId = () => Math.random().toString(16).slice(2);
+
+export const sortContainerItems = (
+  sortSetting: string,
+  array: IVisits[] | DocumentData[]
+) => {
+  if (!sortSetting) return array;
+  if (sortSetting === "employees") {
+    console.log("works");
+    const sortedArray = array.sort((a, b) =>
+      a.employee.localeCompare(b.employee)
+    );
+    console.log(sortedArray);
+    return sortedArray;
+  }
+  if (sortSetting === "payload") {
+    const sortedArray = array.sort((a, b) =>
+      a.payloadType.localeCompare(b.payloadType)
+    );
+    return sortedArray;
+  }
+};

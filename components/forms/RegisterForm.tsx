@@ -4,7 +4,7 @@ import Image from "next/image";
 import logo from "@/public/logo.png";
 import useAuth from "@/hooks/useAuth";
 import Circular from "../ui/CircularProgress";
-import Button from "../ui/Button";
+import LoginButton from "../ui/LoginButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setLoginForm } from "@/redux/slices/formStateSlice";
@@ -100,9 +100,9 @@ const RegisterForm: FC<LoginFormProps> = ({}) => {
         </div>
       </div>
       <div className="flex justify-center items-center space-x-6 ml-14">
-        <Button className="leading-4 sm:leading-6">
+        <LoginButton className="leading-4 sm:leading-6">
           {isLoading ? <Circular /> : "Регистрация"}
-        </Button>
+        </LoginButton>
         <button
           className="hover:bg-gray-200 p-2.5 rounded-full transition duration-200 ease-out"
           onClick={() => dispatch(setLoginForm())}

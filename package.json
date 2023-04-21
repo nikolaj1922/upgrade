@@ -13,6 +13,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@heroicons/react": "^2.0.17",
+    "@material-tailwind/react": "^1.4.2",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@reduxjs/toolkit": "^1.9.5",

@@ -4,12 +4,10 @@ import Image from "next/image";
 import logo from "@/public/logo.png";
 import useAuth from "@/hooks/useAuth";
 import Circular from "../ui/CircularProgress";
-import Button from "../ui/Button";
+import LoginButton from "../ui/LoginButton";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { setRegisterForm } from "@/redux/slices/formStateSlice";
-import { db } from "@/lib/firebase";
-import { doc, addDoc, collection } from "firebase/firestore";
 
 interface LoginFormProps {}
 
@@ -77,9 +75,10 @@ const LoginForm: FC<LoginFormProps> = () => {
         </div>
       </div>
       <div className="flex justify-center items-center space-x-6 ml-14">
-        <Button className="leading-4 sm:leading-6">
+        <LoginButton className="leading-4 sm:leading-6">
           {isLoading ? <Circular /> : "Открыть смену"}
-        </Button>
+        </LoginButton>
+
         <button
           className="hover:bg-gray-200 p-2.5 rounded-full transition duration-200 ease-out"
           onClick={() => dispatch(setRegisterForm())}

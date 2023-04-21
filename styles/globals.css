@@ -21,8 +21,16 @@
     @apply hover:bg-[#d9d9d9] hover:bg-opacity-10 rounded-full cursor-pointer w-[52px] h-[52px] xl:w-auto xl:h-auto xl:py-3 xl:px-4 transition duration-200 ease-out;
   }
 
-  .contaiter-item {
-    @apply px-4 flex space-x-1.5 justify-start border-r;
+  .container-item {
+    @apply flex space-x-1.5 justify-center;
+  }
+
+  .visitModal-group {
+    @apply flex justify-between items-center space-x-6;
+  }
+
+  .visitModal-input {
+    @apply h-[30px] w-[160px] rounded focus:outline-none bg-inherit border-b border-r shadow-sm border-zinc-300 pl-1.5;
   }
 }
 

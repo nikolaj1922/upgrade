@@ -15,6 +15,7 @@ export interface IVisits {
   employee: string;
   visitType: string;
   price: number;
+  payloadType: string;
   timestamp: string;
 }
 

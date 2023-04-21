@@ -18,7 +18,7 @@ import { IAdmin } from "@/types/types";
 import { setAvatar, deleteAvatar } from "@/lib/utils";
 import Avatar from "@mui/material/Avatar";
 import SidebarLink from "./SidebarLink";
-import Button from "./ui/Button";
+import Button from "./ui/LoginButton";
 import useAuth from "@/hooks/useAuth";
 import Circular from "./ui/CircularProgress";
 
@@ -26,7 +26,7 @@ interface SidebarProps {}
 
 const Sidebar: FC<SidebarProps> = ({}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const { logout, admin, isLoading } = useAuth();
+  const { logout, admin } = useAuth();
   const [isChangeName, setIsChangeName] = useState<boolean>(false);
   const isMenuOpen = Boolean(anchorEl);
   const [currentAdminData, setCurrentAdminData] = useState<IAdmin | null>(null);
@@ -113,7 +113,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
   };
 
   return (
-    <div className="min-w-[180px] w-1/4 bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative">
+    <div className="min-w-[180px] w-1/5 bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative">
       <div className="flex flex-col items-center mb-4">
         <Avatar
           src={currentAdminData?.avatarUrl}
@@ -191,7 +191,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
         />
       </div>
       <Button type="button" onClick={logout}>
-        {isLoading ? <Circular /> : "Закрыть смену"}
+        Закрыть смену
       </Button>
     </div>
   );
