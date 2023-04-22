@@ -12,9 +12,11 @@ const MainHeader: FC<HeaderProps> = ({ header, className, isModal }) => {
 
   return (
     <div className="flex justify-between items-end border-b border-zinc-300 pb-3">
-      <h1 className={`text-5xl font-bold ${className}`}>{header}</h1>
+      <h1 className={`text-4xl font-semibold ${className}`}>{header}</h1>
       {!isModal && (
-        <h2 className="text-xl">Смена открыта {getFullDate(timestamp!)}</h2>
+        <h2 className="text-xl font-light">
+          Смена открыта {getFullDate(timestamp!)}
+        </h2>
       )}
     </div>
   );

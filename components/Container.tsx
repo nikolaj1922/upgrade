@@ -45,11 +45,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
     if (dataType === "visits") {
       if (!visits) return <Circular size={40} className="mt-5" />;
       if (!visits.length)
-        return (
-          <h2 className="text-3xl font-semibold text-center mt-4">
-            Нет записей
-          </h2>
-        );
+        return <h2 className="text-3xl text-center mt-4">Нет записей</h2>;
       return visits?.map((item) => (
         <ContainerItemVisit
           key={item.id}
@@ -66,11 +62,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
     if (dataType === "sales") {
       if (!sales) return <Circular size={40} className="mt-5" />;
       if (!sales.length)
-        return (
-          <h2 className="text-3xl font-semibold text-center mt-4">
-            Нет продаж
-          </h2>
-        );
+        return <h2 className="text-3xl text-center mt-4">Нет продаж</h2>;
       return sales?.map((item) => (
         <ContainerItemSale
           key={item.id}

@@ -32,7 +32,7 @@ const AddAndSortSection: FC<AddAndSortSectionProps> = ({
         <PlusIcon className="w-5 h-5" />
       </Button>
       <div className="space-x-4">
-        <span className="text-2xl font-semibold">Сортировать:</span>
+        <span className="text-2xl">Сортировать:</span>
         <FormControl>
           <Select
             defaultValue=""
