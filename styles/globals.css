@@ -6,6 +6,10 @@
   html {
     @apply text-neutral-600;
   }
+
+  main {
+    @apply bg-zinc-200/97 rounded-md w-full p-8 flex flex-col space-y-4;
+  }
 }
 
 @layer components {
@@ -22,7 +26,7 @@
   }
 
   .container-item {
-    @apply flex space-x-1.5 justify-center;
+    @apply flex space-x-2 justify-center;
   }
 
   .visitModal-group {

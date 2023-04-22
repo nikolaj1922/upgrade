@@ -21,7 +21,7 @@ type AppPropsWithLayout = AppProps & {
 
 const progress = new ProgressBar({
   size: 4,
-  color: "#7e22ce",
+  color: "#16a34a",
   className: "z-50",
   delay: 100,
 });

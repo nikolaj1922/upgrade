@@ -15,7 +15,13 @@ import { toast } from "react-hot-toast";
 import { FirebaseError } from "firebase/app";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import { IAdmin } from "@/types/types";
-import { setAvatar, deleteAvatar } from "@/lib/utils";
+import { storage } from "@/lib/firebase";
+import {
+  getDownloadURL,
+  ref,
+  uploadString,
+  deleteObject,
+} from "firebase/storage";
 import Avatar from "@mui/material/Avatar";
 import SidebarLink from "./SidebarLink";
 import Button from "./ui/LoginButton";
@@ -88,6 +94,27 @@ const Sidebar: FC<SidebarProps> = ({}) => {
     } finally {
       setEditedNameIsLoading(false);
     }
+  };
+
+  const setAvatar = (file: string, adminUid: string) => {
+    const avatarRef = ref(storage, `admins/${adminUid}/avatar`);
+
+    uploadString(avatarRef, file, "data_url").then(async () => {
+      const downloadURL = await getDownloadURL(avatarRef);
+      await updateDoc(doc(db, "admins", adminUid), {
+        avatarUrl: downloadURL,
+      });
+    });
+  };
+
+  const deleteAvatar = async (adminUid: string) => {
+    const avatarRef = ref(storage, `admins/${adminUid}/avatar`);
+    deleteObject(avatarRef)
+      .then(() => toast.success("Фото удалено."))
+      .catch(() => toast.error("Не удалось удалить фото. Попробуйте снова."));
+    await updateDoc(doc(db, "admins", adminUid), {
+      avatarUrl: "",
+    });
   };
 
   const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {

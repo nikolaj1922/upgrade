@@ -24,8 +24,10 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import toast from "react-hot-toast";
 import { IAdmin } from "@/types/types";
+import { setShiftId, clearShiftId } from "@/redux/slices/shiftStateSlice";
+import { useAppDispatch } from "./useRedux";
+import toast from "react-hot-toast";
 
 export interface IAuth {
   admin: IAdmin | null;
@@ -47,6 +49,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [admin, setAdmin] = useState<IAdmin | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   useEffect(
@@ -55,6 +58,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         if (user) {
           const adminDoc = await getDoc(doc(db, "admins", user.uid));
           setAdmin(adminDoc.data() as IAdmin);
+          dispatch(setShiftId(localStorage.getItem("shiftId")!));
           router.push("/");
         } else {
           setAdmin(null);
@@ -78,6 +82,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         uid: user.uid,
         name,
       });
+      const docId = await addDoc(collection(db, "work shifts"), {
+        admin: user.uid,
+        visits: [],
+        sales: [],
+        timestamp: serverTimestamp(),
+      });
+      localStorage.setItem("shiftId", docId.id);
+      dispatch(setShiftId(docId.id));
       toast.success("Администратор создан!", {
         duration: 4500,
       });
@@ -115,6 +127,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         timestamp: serverTimestamp(),
       });
       localStorage.setItem("shiftId", docId.id);
+      dispatch(setShiftId(docId.id));
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-email") {
@@ -144,6 +157,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await signOut(auth);
       setAdmin(null);
       localStorage.removeItem("shiftId");
+      dispatch(clearShiftId());
     } catch (err) {
       toast.error("Проблемы с соединением. Попробуйте еще раз.", {
         duration: 4500,

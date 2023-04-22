@@ -1,11 +1,9 @@
-import { FC, useState, SetStateAction, Dispatch, useEffect } from "react";
-import { DocumentData, collection, onSnapshot } from "firebase/firestore";
-import { IEmployee } from "@/types/types";
+import { FC, useState, SetStateAction, Dispatch } from "react";
 import { db } from "@/lib/firebase";
 import { useForm } from "react-hook-form";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
-import { getUniqId, convertDataToTime } from "@/lib/utils";
+import { convertDataToTime, getUniqId } from "@/lib/utils";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
 import MenuItem from "@mui/material/MenuItem";
@@ -15,9 +13,8 @@ import Circular from "../ui/CircularProgress";
 import XRedCircleButton from "../ui/XRedCircleButton";
 
 type FormData = {
-  visitType: string;
+  title: string;
   price: number;
-  employee: string;
   payloadType: string;
 };
 
@@ -27,60 +24,47 @@ interface VisitModalProps {
   shiftId: string | null;
 }
 
-const VisitModal: FC<VisitModalProps> = ({
+const SaleModal: FC<VisitModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
 }) => {
-  const [allEmployees, setAllEmployees] = useState<
-    IEmployee[] | DocumentData[]
-  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [validateFormState, setValidateFormState] = useState<{
-    employeeState: string;
-    visitTypeState: string;
+    titleState: string;
     priceState: string;
     payloadTypeState: string;
   }>({
-    employeeState: "",
-    visitTypeState: "",
+    titleState: "",
     priceState: "",
     payloadTypeState: "",
   });
   const { register, handleSubmit } = useForm<FormData>();
 
-  useEffect(() => {
-    const employeesSubscribe = (): void => {
-      onSnapshot(collection(db, "employees"), (snapshot) => {
-        setAllEmployees(snapshot.docs.map((doc) => doc.data()));
-      });
-    };
-    employeesSubscribe();
-    return () => employeesSubscribe();
-  }, [db]);
-
   const handleClose = (): void => setIsModalOpen(false);
   const checkValidateForm = (): boolean =>
-    !Boolean(validateFormState.employeeState) ||
     !Boolean(validateFormState.payloadTypeState) ||
     !Boolean(validateFormState.priceState) ||
-    !Boolean(validateFormState.visitTypeState);
+    !Boolean(validateFormState.titleState);
 
-  const handleCreateVisit = async (data: FormData) => {
+  console.log(validateFormState);
+  console.log(checkValidateForm());
+
+  const handleCreateSale = async (data: FormData) => {
     try {
       if (!shiftId) return;
       setIsLoading(true);
       await updateDoc(doc(db, "work shifts", shiftId), {
-        visits: arrayUnion({
+        sales: arrayUnion({
           id: getUniqId(),
           ...data,
           timestamp: convertDataToTime(String(new Date())),
         }),
       });
       setIsModalOpen(false);
-      toast.success("Запись создана.");
+      toast.success("Продажа создана.");
     } catch (err) {
-      toast.error("Не удалось создать запись.");
+      toast.error("Не удалось создать продажу.");
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +74,7 @@ const VisitModal: FC<VisitModalProps> = ({
     <Modal open={isModalOpen} onClose={handleClose}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-slate-100 shadow-md p-4 focus:outline-none rounded-sm flex flex-col">
         <div className="relative">
-          <MainHeader header="Новая запись" className="!text-3xl" />
+          <MainHeader header="Новая продажа" className="!text-3xl" />
           <XRedCircleButton
             onClick={() => setIsModalOpen(false)}
             className=" ml-9 cursor-pointer absolute top-1.5 right-0"
@@ -98,53 +82,21 @@ const VisitModal: FC<VisitModalProps> = ({
         </div>
         <form
           className="px-8 space-y-8"
-          onSubmit={handleSubmit(handleCreateVisit)}
+          onSubmit={handleSubmit(handleCreateSale)}
         >
           <div className="space-y-3">
             <div>
               <div className="visitModal-group">
-                <p>Мастер</p>
-                <Select
-                  defaultValue=""
-                  displayEmpty
-                  sx={{ height: "30px", width: "160px" }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        height: "200px",
-                      },
-                    },
-                  }}
-                  {...register("employee", {
-                    required: true,
-                    onChange: (e: SelectChangeEvent) => {
-                      setValidateFormState((prevState) => ({
-                        ...prevState,
-                        employeeState: e.target.value,
-                      }));
-                    },
-                  })}
-                >
-                  {allEmployees.map((employee) => (
-                    <MenuItem key={employee.name} value={employee.name}>
-                      {employee.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-            </div>
-            <div>
-              <div className="visitModal-group">
-                <p>Услуга</p>
+                <p>Наименование</p>
                 <input
                   type="text"
                   className="visitModal-input"
-                  {...register("visitType", {
+                  {...register("title", {
                     required: true,
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       setValidateFormState((prevState) => ({
                         ...prevState,
-                        visitTypeState: e.target.value,
+                        titleState: e.target.value,
                       }));
                     },
                   })}
@@ -193,11 +145,11 @@ const VisitModal: FC<VisitModalProps> = ({
           </div>
           <div className="w-full flex justify-center">
             <Button
-              className="w-[160px]"
+              className="w-[170px]"
               type="submit"
               disabled={checkValidateForm()}
             >
-              {isLoading ? <Circular /> : "Создать запись"}
+              {isLoading ? <Circular /> : "Создать продажу"}
             </Button>
           </div>
         </form>
@@ -206,4 +158,4 @@ const VisitModal: FC<VisitModalProps> = ({
   );
 };
 
-export default VisitModal;
+export default SaleModal;
