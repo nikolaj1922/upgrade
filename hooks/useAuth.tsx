@@ -25,7 +25,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { IAdmin } from "@/types/types";
-import { setShiftId, clearShiftId } from "@/redux/slices/shiftStateSlice";
+import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
 import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
 
@@ -58,8 +58,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         if (user) {
           const adminDoc = await getDoc(doc(db, "admins", user.uid));
           setAdmin(adminDoc.data() as IAdmin);
-          dispatch(setShiftId(localStorage.getItem("shiftId")!));
-          router.push("/");
+          const shift = JSON.parse(localStorage.getItem("shift")!);
+          shift &&
+            dispatch(
+              setShift({ shiftId: shift.id, timestamp: shift.timestamp })
+            );
         } else {
           setAdmin(null);
           router.push("/login");
@@ -88,11 +91,18 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         sales: [],
         timestamp: serverTimestamp(),
       });
-      localStorage.setItem("shiftId", docId.id);
-      dispatch(setShiftId(docId.id));
+      localStorage.setItem(
+        "shift",
+        JSON.stringify({
+          id: docId.id,
+          timestamp: new Date(),
+        })
+      );
+      dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
       toast.success("Администратор создан!", {
         duration: 4500,
       });
+      router.push("/");
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-email") {
@@ -126,8 +136,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         sales: [],
         timestamp: serverTimestamp(),
       });
-      localStorage.setItem("shiftId", docId.id);
-      dispatch(setShiftId(docId.id));
+      localStorage.setItem(
+        "shift",
+        JSON.stringify({
+          id: docId.id,
+          timestamp: new Date(),
+        })
+      );
+      dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
+      router.push("/");
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-email") {
@@ -157,7 +174,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await signOut(auth);
       setAdmin(null);
       localStorage.removeItem("shiftId");
-      dispatch(clearShiftId());
+      dispatch(clearShift());
     } catch (err) {
       toast.error("Проблемы с соединением. Попробуйте еще раз.", {
         duration: 4500,

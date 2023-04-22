@@ -90,7 +90,7 @@ const VisitModal: FC<VisitModalProps> = ({
     <Modal open={isModalOpen} onClose={handleClose}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-slate-100 shadow-md p-4 focus:outline-none rounded-sm flex flex-col">
         <div className="relative">
-          <MainHeader header="Новая запись" className="!text-3xl" />
+          <MainHeader header="Новая запись" isModal className="!text-3xl" />
           <XRedCircleButton
             onClick={() => setIsModalOpen(false)}
             className=" ml-9 cursor-pointer absolute top-1.5 right-0"

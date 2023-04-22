@@ -2,6 +2,7 @@ export type FormType = "login" | "register";
 
 export interface IShiftState {
   shiftId: string | null;
+  timestamp: string | null;
 }
 
 export interface IAdmin {

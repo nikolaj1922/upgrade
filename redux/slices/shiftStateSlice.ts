@@ -3,20 +3,25 @@ import { IShiftState } from "@/types/types";
 
 const initialState: IShiftState = {
   shiftId: null,
+  timestamp: null,
 };
 
 const shiftStateSlice = createSlice({
   name: "shiftState",
   initialState,
   reducers: {
-    setShiftId: (state, action: PayloadAction<string>) => {
-      state.shiftId = action.payload;
+    setShift: (
+      state,
+      action: PayloadAction<{ shiftId: string; timestamp: string }>
+    ) => {
+      state.shiftId = action.payload.shiftId;
+      state.timestamp = action.payload.timestamp;
     },
-    clearShiftId: (state) => {
+    clearShift: (state) => {
       state.shiftId = null;
     },
   },
 });
 
-export const { setShiftId, clearShiftId } = shiftStateSlice.actions;
+export const { setShift, clearShift } = shiftStateSlice.actions;
 export default shiftStateSlice.reducer;

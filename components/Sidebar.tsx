@@ -201,16 +201,20 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           )}
         </div>
       </div>
-      <div className="flex flex-col space-y-3 mb-16">
-        <SidebarLink title="Записи" path="/" Icon={ScissorsIcon} />
-        <SidebarLink title="Продажи" path="/sales" Icon={TagIcon} />
-        <SidebarLink title="Касса" path="/" Icon={BanknotesIcon} />
-        <SidebarLink title="Заказы" path="/" Icon={ShoppingBagIcon} />
-        <SidebarLink
-          title="Зарплата"
-          path="/salary"
-          Icon={CurrencyDollarIcon}
-        />
+      <div className="flex flex-col space-y-8 mb-12">
+        <div>
+          <SidebarLink title="Записи" path="/" Icon={ScissorsIcon} />
+          <SidebarLink title="Продажи" path="/sales" Icon={TagIcon} />
+        </div>
+        <div>
+          <SidebarLink title="Касса" path="/" Icon={BanknotesIcon} />
+          <SidebarLink title="Заказы" path="/" Icon={ShoppingBagIcon} />
+          <SidebarLink
+            title="Зарплата"
+            path="/salary"
+            Icon={CurrencyDollarIcon}
+          />
+        </div>
         <SidebarLink
           title="Архив смен"
           path="/salary"
