@@ -12,6 +12,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useCallback,
   FC,
 } from "react";
 import { auth, db } from "../lib/firebase";
@@ -73,60 +74,65 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     [auth]
   );
 
-  const signUp = async (email: string, password: string, name: string) => {
-    try {
-      setIsLoading(true);
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      await setDoc(doc(db, "admins", user.uid), {
-        uid: user.uid,
-        name,
-      });
-      const docId = await addDoc(collection(db, "work shifts"), {
-        admin: user.uid,
-        visits: [],
-        sales: [],
-        timestamp: serverTimestamp(),
-      });
-      localStorage.setItem(
-        "shift",
-        JSON.stringify({
-          id: docId.id,
-          timestamp: new Date(),
-        })
-      );
-      dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
-      toast.success("Администратор создан!", {
-        duration: 4500,
-      });
-      router.push("/");
-    } catch (err) {
-      if (err instanceof FirebaseError) {
-        if (err.code === "auth/invalid-email") {
-          toast.error("Введите корректный e-mail.", {
-            duration: 4500,
-          });
+  const signUp = useCallback(
+    async (email: string, password: string, name: string) => {
+      try {
+        setIsLoading(true);
+        const { user } = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        await setDoc(doc(db, "admins", user.uid), {
+          uid: user.uid,
+          name,
+        });
+        const docId = await addDoc(collection(db, "work shifts"), {
+          admin: user.uid,
+          visits: [],
+          sales: [],
+          timestamp: serverTimestamp(),
+        });
+        localStorage.setItem(
+          "shift",
+          JSON.stringify({
+            id: docId.id,
+            timestamp: new Date(),
+          })
+        );
+        dispatch(
+          setShift({ shiftId: docId.id, timestamp: String(new Date()) })
+        );
+        toast.success("Администратор создан!", {
+          duration: 4500,
+        });
+        router.push("/");
+      } catch (err) {
+        if (err instanceof FirebaseError) {
+          if (err.code === "auth/invalid-email") {
+            toast.error("Введите корректный e-mail.", {
+              duration: 4500,
+            });
+          }
+          if (err.code === "auth/network-request-failed") {
+            toast.error("Проблемы с соединением. Попробуйте еще раз.", {
+              duration: 4500,
+            });
+          }
+          if (err.code === "auth/email-already-in-use") {
+            toast.error("Этот e-mail уже занят. Используйте другой.", {
+              duration: 4500,
+            });
+          }
         }
-        if (err.code === "auth/network-request-failed") {
-          toast.error("Проблемы с соединением. Попробуйте еще раз.", {
-            duration: 4500,
-          });
-        }
-        if (err.code === "auth/email-already-in-use") {
-          toast.error("Этот e-mail уже занят. Используйте другой.", {
-            duration: 4500,
-          });
-        }
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    []
+  );
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       setIsLoading(true);
       const { user } = await signInWithEmailAndPassword(auth, email, password);
@@ -166,9 +172,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       await signOut(auth);
@@ -182,7 +188,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const memoedValue = useMemo(
     () => ({
