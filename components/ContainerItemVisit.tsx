@@ -1,5 +1,6 @@
 import { FC } from "react";
 import XRedCircleButton from "./ui/XRedCircleButton";
+import { payloadTypeFormat } from "@/lib/utils";
 
 interface ContainerItemVisitProps {
   handleDeleteItem: (id: string) => void;
@@ -20,6 +21,8 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
   handleDeleteItem,
   payloadType,
 }) => {
+  
+
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
       <div className="w-11/12 flex justify-start space-x-8 px-1">
@@ -35,7 +38,9 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
         </div>
         <div className="container-item justify-start w-[100px]">
           <span>Оплата: </span>
-          <span className="font-semibold">{payloadType}</span>
+          <span className="font-semibold">
+            {payloadTypeFormat(payloadType)}
+          </span>
         </div>
         <div className="container-item w-[100px]">
           <span>Цена: </span>

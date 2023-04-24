@@ -1,11 +1,12 @@
 import { FC } from "react";
+import { payloadTypeFormat } from "@/lib/utils";
 import XRedCircleButton from "./ui/XRedCircleButton";
 
 interface ContainerItemSaleProps {
   handleDeleteItem: (id: string) => void;
   id: string;
   title: string;
-  price: string;
+  price: number;
   payloadType: string;
   timestamp: string;
 }
@@ -27,7 +28,9 @@ const ContainerItemSale: FC<ContainerItemSaleProps> = ({
         </div>
         <div className="container-item justify-start w-[100px]">
           <span>Оплата: </span>
-          <span className="font-semibold">{payloadType}</span>
+          <span className="font-semibold">
+            {payloadTypeFormat(payloadType)}
+          </span>
         </div>
         <div className="container-item w-[100px]">
           <span>Цена: </span>

@@ -25,10 +25,15 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { IAdmin } from "@/types/types";
+import { IAdmin, ISale, IVisit } from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
 import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
+import {
+  initGeneral,
+  initSales,
+  initVisits,
+} from "@/redux/slices/cashboxStateSlice";
 
 export interface IAuth {
   admin: IAdmin | null;
@@ -53,6 +58,195 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const initCashState = (
+    isSignIn: boolean,
+    visits?: IVisit[],
+    sales?: ISale[]
+  ) => {
+    if (isSignIn) {
+      dispatch(
+        initGeneral({
+          type: "total",
+          value: 0,
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "card",
+          value: 0,
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "cash",
+          value: 0,
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "kaspi",
+          value: 0,
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "total",
+          value: 0,
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "card",
+          value: 0,
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "cash",
+          value: 0,
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "kaspi",
+          value: 0,
+        })
+      );
+      dispatch(
+        initSales({
+          type: "total",
+          value: 0,
+        })
+      );
+      dispatch(
+        initSales({
+          type: "card",
+          value: 0,
+        })
+      );
+      dispatch(
+        initSales({
+          type: "cash",
+          value: 0,
+        })
+      );
+      dispatch(
+        initSales({
+          type: "kaspi",
+          value: 0,
+        })
+      );
+      return;
+    }
+    if (visits && sales) {
+      dispatch(
+        initGeneral({
+          type: "total",
+          value:
+            visits.reduce((acc, visit) => +visit.price + acc, 0) +
+            sales.reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "card",
+          value:
+            visits
+              .filter((visit) => visit.payloadType === "card")
+              .reduce((acc, visit) => +visit.price + acc, 0) +
+            sales
+              .filter((sale) => sale.payloadType === "card")
+              .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "cash",
+          value:
+            visits
+              .filter((visit) => visit.payloadType === "cash")
+              .reduce((acc, visit) => visit.price + acc, 0) +
+            sales
+              .filter((sale) => sale.payloadType === "cash")
+              .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initGeneral({
+          type: "kaspi",
+          value:
+            visits
+              .filter((visit) => visit.payloadType === "kaspi")
+              .reduce((acc, visit) => visit.price + acc, 0) +
+            sales
+              .filter((sale) => sale.payloadType === "kaspi")
+              .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "total",
+          value: visits.reduce((acc, visit) => +visit.price + acc, 0),
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "card",
+          value: visits
+            .filter((visit) => visit.payloadType === "card")
+            .reduce((acc, visit) => +visit.price + acc, 0),
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "cash",
+          value: visits
+            .filter((visit) => visit.payloadType === "cash")
+            .reduce((acc, visit) => +visit.price + acc, 0),
+        })
+      );
+      dispatch(
+        initVisits({
+          type: "kaspi",
+          value: visits
+            .filter((visit) => visit.payloadType === "kaspi")
+            .reduce((acc, visit) => +visit.price + acc, 0),
+        })
+      );
+      dispatch(
+        initSales({
+          type: "total",
+          value: sales.reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initSales({
+          type: "card",
+          value: sales
+            .filter((sale) => sale.payloadType === "card")
+            .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initSales({
+          type: "cash",
+          value: sales
+            .filter((sale) => sale.payloadType === "cash")
+            .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      dispatch(
+        initSales({
+          type: "kaspi",
+          value: sales
+            .filter((sale) => sale.payloadType === "kaspi")
+            .reduce((acc, sale) => +sale.price + acc, 0),
+        })
+      );
+      return;
+    }
+  };
+
   useEffect(
     () =>
       onAuthStateChanged(auth, async (user) => {
@@ -60,10 +254,18 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           const adminDoc = await getDoc(doc(db, "admins", user.uid));
           setAdmin(adminDoc.data() as IAdmin);
           const shift = JSON.parse(localStorage.getItem("shift")!);
-          shift &&
+          if (shift) {
             dispatch(
               setShift({ shiftId: shift.id, timestamp: shift.timestamp })
             );
+            const shiftDoc = await getDoc(doc(db, "work shifts", shift.id));
+            const shiftParsedDoc = shiftDoc.data();
+            initCashState(
+              false,
+              shiftParsedDoc?.visits as IVisit[],
+              shiftParsedDoc?.sales as ISale[]
+            );
+          }
         } else {
           setAdmin(null);
           router.push("/login");
@@ -103,6 +305,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch(
           setShift({ shiftId: docId.id, timestamp: String(new Date()) })
         );
+        initCashState(true);
         toast.success("Администратор создан!", {
           duration: 4500,
         });
@@ -150,6 +353,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       );
       dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
+      initCashState(true);
       router.push("/");
     } catch (err) {
       if (err instanceof FirebaseError) {

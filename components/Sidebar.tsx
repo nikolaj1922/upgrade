@@ -207,7 +207,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           <SidebarLink title="Продажи" path="/sales" Icon={TagIcon} />
         </div>
         <div>
-          <SidebarLink title="Касса" path="/" Icon={BanknotesIcon} />
+          <SidebarLink title="Касса" path="/cashbox" Icon={BanknotesIcon} />
           <SidebarLink title="Заказы" path="/" Icon={ShoppingBagIcon} />
           <SidebarLink
             title="Зарплата"

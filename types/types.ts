@@ -15,20 +15,22 @@ export interface Event<T = EventTarget> {
   target: T;
 }
 
+export type PayloadType = "total" | "card" | "cash" | "kaspi";
+
 export interface IVisit {
   id: string;
   employee: string;
   visitType: string;
   price: number;
-  payloadType: string;
+  payloadType: PayloadType;
   timestamp: string;
 }
 
 export interface ISale {
   id: string;
   title: string;
-  price: string;
-  payloadType: string;
+  price: number;
+  payloadType: PayloadType;
   timestamp: string;
 }
 
@@ -41,4 +43,20 @@ export interface IWorkShift {
 
 export interface IEmployee {
   name: string;
+}
+
+export interface ICashboxSlice {
+  generalTotal: number;
+  generalCash: number;
+  generalCard: number;
+  generalKaspi: number;
+  visitsTotal: number;
+  visitsCash: number;
+  visitsCard: number;
+  visitsKaspi: number;
+  salesTotal: number;
+  salesCash: number;
+  salesCard: number;
+  salesKaspi: number;
+  paintTotal: number;
 }

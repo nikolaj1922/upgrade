@@ -10,7 +10,7 @@ import AddAndSortSection from "@/components/AddAndSortSection";
 
 interface ServicesProps {}
 
-const Services: FC<ServicesProps> = ({}) => {
+const Visits: FC<ServicesProps> = ({}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [visits, setVisits] = useState<IVisit[] | DocumentData[] | null>(null);
   const [sortSelect, setSortSelect] = useState<string>("");
@@ -82,4 +82,4 @@ const Services: FC<ServicesProps> = ({}) => {
   );
 };
 
-export default Services;
+export default Visits;

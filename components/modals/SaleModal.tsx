@@ -4,6 +4,9 @@ import { useForm } from "react-hook-form";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { convertDataToTime, getUniqId } from "@/lib/utils";
+import { addToSales, addToGeneral } from "@/redux/slices/cashboxStateSlice";
+import { useAppDispatch } from "@/hooks/useRedux";
+import { PayloadType } from "@/types/types";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
 import MenuItem from "@mui/material/MenuItem";
@@ -15,7 +18,7 @@ import XRedCircleButton from "../ui/XRedCircleButton";
 type FormData = {
   title: string;
   price: number;
-  payloadType: string;
+  payloadType: PayloadType;
 };
 
 interface VisitModalProps {
@@ -40,6 +43,7 @@ const SaleModal: FC<VisitModalProps> = ({
     payloadTypeState: "",
   });
   const { register, handleSubmit } = useForm<FormData>();
+  const dispatch = useAppDispatch();
 
   const handleClose = (): void => setIsModalOpen(false);
   const checkValidateForm = (): boolean =>
@@ -58,6 +62,30 @@ const SaleModal: FC<VisitModalProps> = ({
           timestamp: convertDataToTime(String(new Date())),
         }),
       });
+      dispatch(
+        addToSales({
+          type: data.payloadType,
+          value: data.price,
+        })
+      );
+      dispatch(
+        addToSales({
+          type: "total",
+          value: data.price,
+        })
+      );
+      dispatch(
+        addToGeneral({
+          type: data.payloadType,
+          value: data.price,
+        })
+      );
+      dispatch(
+        addToGeneral({
+          type: "total",
+          value: data.price,
+        })
+      );
       setIsModalOpen(false);
       toast.success("Продажа создана.");
     } catch (err) {
@@ -133,9 +161,9 @@ const SaleModal: FC<VisitModalProps> = ({
                     },
                   })}
                 >
-                  <MenuItem value="Нал.">Наличные</MenuItem>
-                  <MenuItem value="Карта">Карта</MenuItem>
-                  <MenuItem value="Каспи">Каспи Банк</MenuItem>
+                  <MenuItem value="cash">Наличные</MenuItem>
+                  <MenuItem value="card">Карта</MenuItem>
+                  <MenuItem value="kaspi">Каспи Банк</MenuItem>
                 </Select>
               </div>
             </div>
