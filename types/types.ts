@@ -56,11 +56,15 @@ export interface ICashboxSlice {
   visitsCash: number;
   visitsCard: number;
   visitsKaspi: number;
-  salesTotal: number;
-  salesCash: number;
-  salesCard: number;
-  salesKaspi: number;
-  paintTotal: {
+  salesMenTotal: number;
+  salesMenCash: number;
+  salesMenCard: number;
+  salesMenKaspi: number;
+  paintTotal: number;
+  paintCash: number;
+  paintCard: number;
+  paintKaspi: number;
+  employeeSalaryPaint: {
     id: string;
     employee: string;
     value: number;
@@ -70,4 +74,13 @@ export interface ICashboxSlice {
 export interface ISalary {
   employee: string;
   revenue: number;
+}
+
+export interface IPaint {
+  id: string;
+  payloadType: PayloadType;
+  employee: string;
+  title: string;
+  price: number;
+  timestamp: string;
 }

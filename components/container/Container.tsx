@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { IVisit, ISale, ISalary } from "@/types/types";
+import { IVisit, ISale, ISalary, IPaint } from "@/types/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { toast } from "react-hot-toast";
@@ -7,22 +7,34 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import ContainerItemVisit from "./ContainerItemVisit";
 import ContainerItemSale from "./ContainerItemSale";
 import Circular from "../ui/CircularProgress";
-import { subFromPaint, subFromVisits } from "@/redux/slices/cashboxStateSlice";
+import {
+  subFromEmployeeSalaryPaint,
+  subFromPaint,
+  subFromVisits,
+} from "@/redux/slices/cashboxStateSlice";
 import { subFromGeneral } from "@/redux/slices/cashboxStateSlice";
-import { subFromSales } from "@/redux/slices/cashboxStateSlice";
+import { subFromSalesMen } from "@/redux/slices/cashboxStateSlice";
 import { reduceSalary } from "@/redux/slices/salaryStateSlice";
 import ContainerItemSalary from "./ContainerItemSalary";
+import ContainerItemPaint from "./ContainerItemPaint";
 
 interface ContainerProps {
   visits?: IVisit[];
-  sales?: ISale[];
+  salesMen?: ISale[];
   salary?: ISalary[];
-  dataType: "visits" | "sales" | "salary";
+  paint?: IPaint[];
+  dataType: "visits" | "salesMen" | "salary" | "paint";
 }
 
-type SubFrom = "visits" | "sales";
+type SubFrom = "visits" | "salesMen" | "paint";
 
-const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
+const Container: FC<ContainerProps> = ({
+  visits,
+  salesMen,
+  salary,
+  paint,
+  dataType,
+}) => {
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const dispatch = useAppDispatch();
 
@@ -54,20 +66,20 @@ const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
         })
       );
       if (paintId) {
-        dispatch(subFromPaint(paintId));
+        dispatch(subFromEmployeeSalaryPaint(paintId));
       }
       return;
     }
-    if (subFrom === "sales") {
-      const deletedElement = sales?.find((item) => item.id === id);
+    if (subFrom === "salesMen") {
+      const deletedElement = salesMen?.find((item) => item.id === id);
       dispatch(
-        subFromSales({
+        subFromSalesMen({
           type: deletedElement?.payloadType!,
           value: deletedElement?.price!,
         })
       );
       dispatch(
-        subFromSales({
+        subFromSalesMen({
           type: "total",
           value: deletedElement?.price!,
         })
@@ -75,6 +87,36 @@ const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
       dispatch(
         subFromGeneral({
           type: deletedElement?.payloadType!,
+          value: deletedElement?.price!,
+        })
+      );
+      dispatch(
+        subFromGeneral({
+          type: "total",
+          value: deletedElement?.price!,
+        })
+      );
+      return;
+    }
+    if (subFrom === "paint") {
+      const deletedElement = paint?.find((item) => item.id === id);
+      if (deletedElement?.payloadType) {
+        dispatch(
+          subFromPaint({
+            type: deletedElement?.payloadType!,
+            value: deletedElement?.price!,
+          })
+        );
+        dispatch(
+          subFromGeneral({
+            type: deletedElement?.payloadType!,
+            value: deletedElement?.price!,
+          })
+        );
+      }
+      dispatch(
+        subFromPaint({
+          type: "total",
           value: deletedElement?.price!,
         })
       );
@@ -113,21 +155,42 @@ const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
         toast.success("Запись удалена.");
         return;
       }
-      if (dataType === "sales") {
-        const updatedArray = sales?.filter((item) => item.id !== id);
+      if (dataType === "salesMen") {
+        const updatedArray = salesMen?.filter((item) => item.id !== id);
         await updateDoc(doc(db, "work shifts", shiftId), {
-          sales: updatedArray,
+          salesMen: updatedArray,
         });
-        subFromCashState(id, "sales");
+        subFromCashState(id, "salesMen");
         toast.success("Продажа удалена.");
         return;
       }
+      if (dataType === "paint") {
+        const updatedArray = paint?.filter((item) => item.id !== id);
+        await updateDoc(doc(db, "work shifts", shiftId), {
+          paint: updatedArray,
+        });
+
+        toast.success("Краска удалена.");
+        return;
+      }
     } catch (err) {
-      toast.error("Не удалось удалить запись.");
+      toast.error("Не удалось удалить. Попробуйте еще раз.");
     }
   };
 
   const render = () => {
+    if (dataType === "paint") {
+      if (!paint) return <Circular size={40} className="mt-5" />;
+      if (!paint.length)
+        return <h2 className="text-3xl text-center mt-4">Нет записей</h2>;
+      return paint?.map((paint) => (
+        <ContainerItemPaint
+          key={paint.id}
+          paint={paint}
+          handleDeleteItem={handleDeleteItem}
+        />
+      ));
+    }
     if (dataType === "salary") {
       if (!salary) return <Circular size={40} className="mt-5" />;
       if (!salary.length)
@@ -162,11 +225,11 @@ const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
         />
       ));
     }
-    if (dataType === "sales") {
-      if (!sales) return <Circular size={40} className="mt-5" />;
-      if (!sales.length)
+    if (dataType === "salesMen") {
+      if (!salesMen) return <Circular size={40} className="mt-5" />;
+      if (!salesMen.length)
         return <h2 className="text-3xl text-center mt-4">Нет продаж</h2>;
-      return sales?.map((item) => (
+      return salesMen?.map((item) => (
         <ContainerItemSale
           key={item.id}
           id={item.id}

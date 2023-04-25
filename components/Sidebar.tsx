@@ -7,6 +7,8 @@ import {
   TagIcon,
   CalendarDaysIcon,
   CheckCircleIcon,
+  PaintBrushIcon,
+  CircleStackIcon,
 } from "@heroicons/react/24/outline";
 import { Menu, MenuItem } from "@mui/material";
 import { updateDoc, doc, onSnapshot } from "firebase/firestore";
@@ -140,7 +142,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
   };
 
   return (
-    <div className="min-w-[180px] w-1/5 bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative">
+    <div className="min-w-[200px] bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative px-2">
       <div className="flex flex-col items-center mb-4">
         <Avatar
           src={currentAdminData?.avatarUrl}
@@ -204,7 +206,9 @@ const Sidebar: FC<SidebarProps> = ({}) => {
       <div className="flex flex-col space-y-8 mb-12">
         <div>
           <SidebarLink title="Записи" path="/" Icon={ScissorsIcon} />
-          <SidebarLink title="Продажи" path="/sales" Icon={TagIcon} />
+          <SidebarLink title="Продажи М" path="/sales" Icon={TagIcon} />
+          <SidebarLink title="Краска" path="/paint" Icon={PaintBrushIcon} />
+          <SidebarLink title="Общее" path="/general" Icon={CircleStackIcon} />
         </div>
         <div>
           <SidebarLink title="Касса" path="/cashbox" Icon={BanknotesIcon} />

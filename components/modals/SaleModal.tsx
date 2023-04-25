@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { convertDataToTime, getUniqId } from "@/lib/utils";
-import { addToSales, addToGeneral } from "@/redux/slices/cashboxStateSlice";
+import { addToSalesMen, addToGeneral } from "@/redux/slices/cashboxStateSlice";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { PayloadType } from "@/types/types";
 import Modal from "@mui/material/Modal";
@@ -21,13 +21,13 @@ type FormData = {
   payloadType: PayloadType;
 };
 
-interface VisitModalProps {
+interface SaleModalProps {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   shiftId: string | null;
 }
 
-const SaleModal: FC<VisitModalProps> = ({
+const SaleModal: FC<SaleModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
@@ -56,20 +56,20 @@ const SaleModal: FC<VisitModalProps> = ({
       if (!shiftId) return;
       setIsLoading(true);
       await updateDoc(doc(db, "work shifts", shiftId), {
-        sales: arrayUnion({
+        salesMen: arrayUnion({
           id: getUniqId(),
           ...data,
           timestamp: convertDataToTime(String(new Date())),
         }),
       });
       dispatch(
-        addToSales({
+        addToSalesMen({
           type: data.payloadType,
           value: data.price,
         })
       );
       dispatch(
-        addToSales({
+        addToSalesMen({
           type: "total",
           value: data.price,
         })

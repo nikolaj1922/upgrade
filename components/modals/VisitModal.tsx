@@ -10,7 +10,7 @@ import { useAppDispatch } from "@/hooks/useRedux";
 import {
   addToVisits,
   addToGeneral,
-  addToPaint,
+  addToEmployeeSalaryPaint,
 } from "@/redux/slices/cashboxStateSlice";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
@@ -123,7 +123,7 @@ const VisitModal: FC<VisitModalProps> = ({
       );
       if (data.paint > 0) {
         dispatch(
-          addToPaint({
+          addToEmployeeSalaryPaint({
             id: paintId,
             employee: data.employee,
             value: data.paint,

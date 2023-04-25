@@ -47,7 +47,7 @@ const Sales: FC<salesProps> = ({}) => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
         const data = snapshot.data();
-        const salesArray: Array<ISale> = data?.sales;
+        const salesArray: Array<ISale> = data?.salesMen;
         if (!salesArray) return;
         if (!sortSelect) {
           setSales(salesArray.reverse());
@@ -63,13 +63,13 @@ const Sales: FC<salesProps> = ({}) => {
 
   return (
     <main>
-      <MainHeader header="Продажи" />
+      <MainHeader header="Продажи М" />
       <AddAndSortSection
         setIsModalOpen={setIsModalOpen}
         setSortSelect={setSortSelect}
         sortItems={sortData}
       />
-      <Container dataType="sales" sales={sales as ISale[]} />
+      <Container dataType="salesMen" salesMen={sales as ISale[]} />
       {isModalOpen && (
         <SaleModal
           isModalOpen={isModalOpen}

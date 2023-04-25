@@ -25,15 +25,16 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { IAdmin, ISalary, ISale, IVisit } from "@/types/types";
+import { IAdmin, IPaint, ISalary, ISale, IVisit } from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
 import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
 import {
   initGeneral,
-  initPaint,
-  initSales,
+  initEmployeeSalaryPaint,
+  initSalesMen,
   initVisits,
+  initPaint,
 } from "@/redux/slices/cashboxStateSlice";
 import { initSalary } from "@/redux/slices/salaryStateSlice";
 
@@ -63,7 +64,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const initCashState = (
     isSignIn: boolean,
     visits?: IVisit[],
-    sales?: ISale[]
+    salesMen?: ISale[],
+    paint?: IPaint[]
   ) => {
     if (isSignIn) {
       dispatch(
@@ -79,15 +81,21 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       );
       dispatch(
-        initSales({
+        initSalesMen({
           type: "signIn",
           value: 0,
         })
       );
-      dispatch(initPaint([]));
+      dispatch(
+        initPaint({
+          type: "signIn",
+          value: 0,
+        })
+      );
+      dispatch(initEmployeeSalaryPaint([]));
       dispatch(initSalary([]));
     }
-    if (visits && sales) {
+    if (visits && salesMen && paint) {
       const salary: Array<ISalary> = visits.map((visit) => ({
         employee: visit.employee,
         revenue: visit.price,
@@ -98,7 +106,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           type: "total",
           value:
             visits.reduce((acc, visit) => +visit.price + acc, 0) +
-            sales.reduce((acc, sale) => +sale.price + acc, 0),
+            salesMen.reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
       dispatch(
@@ -108,7 +116,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             visits
               .filter((visit) => visit.payloadType === "card")
               .reduce((acc, visit) => +visit.price + acc, 0) +
-            sales
+            salesMen
               .filter((sale) => sale.payloadType === "card")
               .reduce((acc, sale) => +sale.price + acc, 0),
         })
@@ -120,7 +128,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             visits
               .filter((visit) => visit.payloadType === "cash")
               .reduce((acc, visit) => +visit.price + acc, 0) +
-            sales
+            salesMen
               .filter((sale) => sale.payloadType === "cash")
               .reduce((acc, sale) => +sale.price + acc, 0),
         })
@@ -132,7 +140,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             visits
               .filter((visit) => visit.payloadType === "kaspi")
               .reduce((acc, visit) => +visit.price + acc, 0) +
-            sales
+            salesMen
               .filter((sale) => sale.payloadType === "kaspi")
               .reduce((acc, sale) => +sale.price + acc, 0),
         })
@@ -168,37 +176,67 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       );
       dispatch(
-        initSales({
+        initSalesMen({
           type: "total",
-          value: sales.reduce((acc, sale) => +sale.price + acc, 0),
+          value: salesMen.reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
       dispatch(
-        initSales({
+        initSalesMen({
           type: "card",
-          value: sales
+          value: salesMen
             .filter((sale) => sale.payloadType === "card")
             .reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
       dispatch(
-        initSales({
+        initSalesMen({
           type: "cash",
-          value: sales
+          value: salesMen
             .filter((sale) => sale.payloadType === "cash")
             .reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
       dispatch(
-        initSales({
+        initSalesMen({
           type: "kaspi",
-          value: sales
+          value: salesMen
             .filter((sale) => sale.payloadType === "kaspi")
             .reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
       dispatch(
-        initPaint(
+        initPaint({
+          type: "total",
+          value: paint.reduce((acc, paint) => +paint.price + acc, 0),
+        })
+      );
+      dispatch(
+        initPaint({
+          type: "card",
+          value: paint
+            .filter((paint) => paint.payloadType === "card")
+            .reduce((acc, paint) => +paint.price + acc, 0),
+        })
+      );
+      dispatch(
+        initPaint({
+          type: "cash",
+          value: paint
+            .filter((paint) => paint.payloadType === "cash")
+            .reduce((acc, paint) => +paint.price + acc, 0),
+        })
+      );
+      dispatch(
+        initPaint({
+          type: "kaspi",
+          value: paint
+            .filter((paint) => paint.payloadType === "kaspi")
+            .reduce((acc, paint) => +paint.price + acc, 0),
+        })
+      );
+      dispatch(
+        initEmployeeSalaryPaint(
           visits
             .filter((visit) => visit.paint > 0)
             .map((visit) => ({
@@ -227,7 +265,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             initCashState(
               false,
               shiftParsedDoc?.visits as IVisit[],
-              shiftParsedDoc?.sales as ISale[]
+              shiftParsedDoc?.salesMen as ISale[],
+              shiftParsedDoc?.paint as IPaint[]
             );
           }
         } else {
@@ -256,7 +295,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         const docId = await addDoc(collection(db, "work shifts"), {
           admin: user.uid,
           visits: [],
-          sales: [],
+          salesMen: [],
+          paint: [],
           timestamp: serverTimestamp(),
         });
         localStorage.setItem(
@@ -306,7 +346,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       const docId = await addDoc(collection(db, "work shifts"), {
         admin: user.uid,
         visits: [],
-        sales: [],
+        salesMen: [],
+        paint: [],
         timestamp: serverTimestamp(),
       });
       localStorage.setItem(
