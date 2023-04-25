@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { payloadTypeFormat } from "@/lib/utils";
-import XRedCircleButton from "./ui/XRedCircleButton";
+import XRedCircleButton from "../ui/XRedCircleButton";
 
 interface ContainerItemSaleProps {
   handleDeleteItem: (id: string) => void;
@@ -21,7 +21,7 @@ const ContainerItemSale: FC<ContainerItemSaleProps> = ({
 }) => {
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
-      <div className="w-11/12 flex justify-start space-x-8 px-1">
+      <div className="w-11/12 flex justify-start items-center space-x-8 px-1">
         <div className="container-item w-[350px] justify-start">
           <span>Наименование: </span>
           <span className="font-semibold">{title}</span>

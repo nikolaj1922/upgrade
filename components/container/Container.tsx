@@ -1,25 +1,28 @@
 import { FC } from "react";
-import { IVisit, ISale } from "@/types/types";
+import { IVisit, ISale, ISalary } from "@/types/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { toast } from "react-hot-toast";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import ContainerItemVisit from "./ContainerItemVisit";
 import ContainerItemSale from "./ContainerItemSale";
-import Circular from "./ui/CircularProgress";
+import Circular from "../ui/CircularProgress";
 import { subFromPaint, subFromVisits } from "@/redux/slices/cashboxStateSlice";
 import { subFromGeneral } from "@/redux/slices/cashboxStateSlice";
 import { subFromSales } from "@/redux/slices/cashboxStateSlice";
+import { reduceSalary } from "@/redux/slices/salaryStateSlice";
+import ContainerItemSalary from "./ContainerItemSalary";
 
 interface ContainerProps {
   visits?: IVisit[];
   sales?: ISale[];
-  dataType: "visits" | "sales";
+  salary?: ISalary[];
+  dataType: "visits" | "sales" | "salary";
 }
 
 type SubFrom = "visits" | "sales";
 
-const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
+const Container: FC<ContainerProps> = ({ visits, sales, salary, dataType }) => {
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const dispatch = useAppDispatch();
 
@@ -85,7 +88,12 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
     }
   };
 
-  const handleDeleteItem = async (id: string, paintId?: string) => {
+  const handleDeleteItem = async (
+    id: string,
+    paintId?: string,
+    employee?: string,
+    value?: number
+  ) => {
     try {
       if (!shiftId) return;
       if (dataType === "visits") {
@@ -94,6 +102,14 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
           visits: updatedArray,
         });
         subFromCashState(id, "visits", paintId);
+        if (employee && value) {
+          dispatch(
+            reduceSalary({
+              employee,
+              value,
+            })
+          );
+        }
         toast.success("Запись удалена.");
         return;
       }
@@ -112,6 +128,22 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
   };
 
   const render = () => {
+    if (dataType === "salary") {
+      if (!salary) return <Circular size={40} className="mt-5" />;
+      if (!salary.length)
+        return (
+          <h2 className="text-3xl text-center mt-4">
+            Чтобы узнать зарплату, добавьте записи
+          </h2>
+        );
+      return salary?.map((salary) => (
+        <ContainerItemSalary
+          key={salary.employee}
+          employee={salary.employee}
+          revenue={salary.revenue}
+        />
+      ));
+    }
     if (dataType === "visits") {
       if (!visits) return <Circular size={40} className="mt-5" />;
       if (!visits.length)

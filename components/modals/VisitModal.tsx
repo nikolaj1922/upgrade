@@ -19,6 +19,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "../ui/Button";
 import Circular from "../ui/CircularProgress";
 import XRedCircleButton from "../ui/XRedCircleButton";
+import { addSalary } from "@/redux/slices/salaryStateSlice";
 
 type FormData = {
   visitType: string;
@@ -90,6 +91,12 @@ const VisitModal: FC<VisitModalProps> = ({
           timestamp: convertDataToTime(String(new Date())),
         }),
       });
+      dispatch(
+        addSalary({
+          employee: data.employee,
+          value: data.price,
+        })
+      );
       dispatch(
         addToVisits({
           type: data.payloadType,

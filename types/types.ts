@@ -66,3 +66,8 @@ export interface ICashboxSlice {
     value: number;
   }[];
 }
+
+export interface ISalary {
+  employee: string;
+  revenue: number;
+}

@@ -25,7 +25,7 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { IAdmin, ISale, IVisit } from "@/types/types";
+import { IAdmin, ISalary, ISale, IVisit } from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
 import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
@@ -35,6 +35,7 @@ import {
   initSales,
   initVisits,
 } from "@/redux/slices/cashboxStateSlice";
+import { initSalary } from "@/redux/slices/salaryStateSlice";
 
 export interface IAuth {
   admin: IAdmin | null;
@@ -65,7 +66,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     sales?: ISale[]
   ) => {
     if (isSignIn) {
-      console.log("init signIn");
       dispatch(
         initGeneral({
           type: "signIn",
@@ -85,8 +85,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         })
       );
       dispatch(initPaint([]));
+      dispatch(initSalary([]));
     }
     if (visits && sales) {
+      const salary: Array<ISalary> = visits.map((visit) => ({
+        employee: visit.employee,
+        revenue: visit.price,
+      }));
+      dispatch(initSalary(salary));
       dispatch(
         initGeneral({
           type: "total",
@@ -113,7 +119,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           value:
             visits
               .filter((visit) => visit.payloadType === "cash")
-              .reduce((acc, visit) => visit.price + acc, 0) +
+              .reduce((acc, visit) => +visit.price + acc, 0) +
             sales
               .filter((sale) => sale.payloadType === "cash")
               .reduce((acc, sale) => +sale.price + acc, 0),
@@ -125,7 +131,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           value:
             visits
               .filter((visit) => visit.payloadType === "kaspi")
-              .reduce((acc, visit) => visit.price + acc, 0) +
+              .reduce((acc, visit) => +visit.price + acc, 0) +
             sales
               .filter((sale) => sale.payloadType === "kaspi")
               .reduce((acc, sale) => +sale.price + acc, 0),

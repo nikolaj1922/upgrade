@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 import { IVisit } from "@/types/types";
 import { useAppSelector } from "@/hooks/useRedux";
 import MainHeader from "@/components/Header";
-import Container from "@/components/Container";
+import Container from "@/components/container/Container";
 import VisitModal from "@/components/modals/VisitModal";
 import AddAndSortSection from "@/components/AddAndSortSection";
 

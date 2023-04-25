@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { useAppSelector } from "@/hooks/useRedux";
 import MainHeader from "@/components/Header";
 import AddAndSortSection from "@/components/AddAndSortSection";
-import Container from "@/components/Container";
+import Container from "@/components/container/Container";
 import SaleModal from "@/components/modals/SaleModal";
 
 interface salesProps {}
