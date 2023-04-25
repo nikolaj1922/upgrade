@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import ContainerItemVisit from "./ContainerItemVisit";
 import ContainerItemSale from "./ContainerItemSale";
 import Circular from "./ui/CircularProgress";
-import { subFromVisits } from "@/redux/slices/cashboxStateSlice";
+import { subFromPaint, subFromVisits } from "@/redux/slices/cashboxStateSlice";
 import { subFromGeneral } from "@/redux/slices/cashboxStateSlice";
 import { subFromSales } from "@/redux/slices/cashboxStateSlice";
 
@@ -23,7 +23,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const dispatch = useAppDispatch();
 
-  const subFromCashState = (id: string, subFrom: SubFrom) => {
+  const subFromCashState = (id: string, subFrom: SubFrom, paintId?: string) => {
     if (subFrom === "visits") {
       const deletedElement = visits?.find((item) => item.id === id);
       dispatch(
@@ -50,6 +50,9 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
           value: deletedElement?.price!,
         })
       );
+      if (paintId) {
+        dispatch(subFromPaint(paintId));
+      }
       return;
     }
     if (subFrom === "sales") {
@@ -82,7 +85,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
     }
   };
 
-  const handleDeleteItem = async (id: string) => {
+  const handleDeleteItem = async (id: string, paintId?: string) => {
     try {
       if (!shiftId) return;
       if (dataType === "visits") {
@@ -90,7 +93,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
         await updateDoc(doc(db, "work shifts", shiftId), {
           visits: updatedArray,
         });
-        subFromCashState(id, "visits");
+        subFromCashState(id, "visits", paintId);
         toast.success("Запись удалена.");
         return;
       }
@@ -117,6 +120,7 @@ const Container: FC<ContainerProps> = ({ visits, sales, dataType }) => {
         <ContainerItemVisit
           key={item.id}
           id={item.id}
+          paintId={item.paintId}
           employee={item.employee}
           price={item.price}
           timestamp={item.timestamp}

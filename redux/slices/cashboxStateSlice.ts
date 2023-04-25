@@ -15,7 +15,7 @@ const initialState: ICashboxSlice = {
   salesCash: 0,
   salesCard: 0,
   salesKaspi: 0,
-  paintTotal: 0,
+  paintTotal: [],
 };
 
 const cashboxStateSlice = createSlice({
@@ -26,16 +26,22 @@ const cashboxStateSlice = createSlice({
       state,
       action: PayloadAction<{ type: PayloadType; value: number }>
     ) => {
+      if (action.payload.type === "signIn") {
+        state.generalTotal = +action.payload.value;
+        state.generalCard = +action.payload.value;
+        state.generalCash = +action.payload.value;
+        state.generalKaspi = +action.payload.value;
+      }
       if (action.payload.type === "total") {
         state.generalTotal = +action.payload.value;
       }
-      if (action.type === "cash") {
+      if (action.payload.type === "cash") {
         state.generalCash = +action.payload.value;
       }
-      if (action.type === "card") {
+      if (action.payload.type === "card") {
         state.generalCard = +action.payload.value;
       }
-      if (action.type === "kaspi") {
+      if (action.payload.type === "kaspi") {
         state.generalKaspi = +action.payload.value;
       }
     },
@@ -43,6 +49,12 @@ const cashboxStateSlice = createSlice({
       state,
       action: PayloadAction<{ type: PayloadType; value: number }>
     ) => {
+      if (action.payload.type === "signIn") {
+        state.visitsTotal = +action.payload.value;
+        state.visitsCash = +action.payload.value;
+        state.visitsCard = +action.payload.value;
+        state.visitsKaspi = +action.payload.value;
+      }
       if (action.payload.type === "total") {
         state.visitsTotal = +action.payload.value;
       }
@@ -60,6 +72,12 @@ const cashboxStateSlice = createSlice({
       state,
       action: PayloadAction<{ type: PayloadType; value: number }>
     ) => {
+      if (action.payload.type === "signIn") {
+        state.salesTotal = +action.payload.value;
+        state.salesCash = +action.payload.value;
+        state.salesCard = +action.payload.value;
+        state.salesKaspi = +action.payload.value;
+      }
       if (action.payload.type === "total") {
         state.salesTotal = +action.payload.value;
       }
@@ -73,8 +91,11 @@ const cashboxStateSlice = createSlice({
         state.salesKaspi = +action.payload.value;
       }
     },
-    initPaint: (state, action: PayloadAction<number>) => {
-      state.paintTotal = +action.payload;
+    initPaint: (
+      state,
+      action: PayloadAction<{ id: string; employee: string; value: number }[]>
+    ) => {
+      state.paintTotal = action.payload;
     },
     addToGeneral: (
       state,
@@ -178,13 +199,20 @@ const cashboxStateSlice = createSlice({
         state.salesKaspi -= +action.payload.value;
       }
     },
-    addToPaint: (state, action: PayloadAction<number>) => {
-      state.paintTotal += +action.payload;
+    addToPaint: (
+      state,
+      action: PayloadAction<{ id: string; employee: string; value: number }>
+    ) => {
+      state.paintTotal.push({
+        id: action.payload.id,
+        employee: action.payload.employee,
+        value: action.payload.value,
+      });
     },
-    subFromPaint: (state, action: PayloadAction<number>) => {
-      if (state.paintTotal >= 0) {
-        state.paintTotal -= +action.payload;
-      }
+    subFromPaint: (state, action: PayloadAction<string>) => {
+      state.paintTotal = state.paintTotal.filter(
+        (paint) => paint.id !== action.payload
+      );
     },
   },
 });

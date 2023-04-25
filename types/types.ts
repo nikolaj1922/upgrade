@@ -15,15 +15,17 @@ export interface Event<T = EventTarget> {
   target: T;
 }
 
-export type PayloadType = "total" | "card" | "cash" | "kaspi";
+export type PayloadType = "total" | "card" | "cash" | "kaspi" | "signIn";
 
 export interface IVisit {
   id: string;
+  paintId: string;
   employee: string;
   visitType: string;
   price: number;
   payloadType: PayloadType;
   timestamp: string;
+  paint: number;
 }
 
 export interface ISale {
@@ -58,5 +60,9 @@ export interface ICashboxSlice {
   salesCash: number;
   salesCard: number;
   salesKaspi: number;
-  paintTotal: number;
+  paintTotal: {
+    id: string;
+    employee: string;
+    value: number;
+  }[];
 }

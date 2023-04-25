@@ -31,6 +31,7 @@ import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
 import {
   initGeneral,
+  initPaint,
   initSales,
   initVisits,
 } from "@/redux/slices/cashboxStateSlice";
@@ -64,79 +65,26 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     sales?: ISale[]
   ) => {
     if (isSignIn) {
+      console.log("init signIn");
       dispatch(
         initGeneral({
-          type: "total",
-          value: 0,
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "card",
-          value: 0,
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "cash",
-          value: 0,
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "kaspi",
+          type: "signIn",
           value: 0,
         })
       );
       dispatch(
         initVisits({
-          type: "total",
-          value: 0,
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "card",
-          value: 0,
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "cash",
-          value: 0,
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "kaspi",
+          type: "signIn",
           value: 0,
         })
       );
       dispatch(
         initSales({
-          type: "total",
+          type: "signIn",
           value: 0,
         })
       );
-      dispatch(
-        initSales({
-          type: "card",
-          value: 0,
-        })
-      );
-      dispatch(
-        initSales({
-          type: "cash",
-          value: 0,
-        })
-      );
-      dispatch(
-        initSales({
-          type: "kaspi",
-          value: 0,
-        })
-      );
-      return;
+      dispatch(initPaint([]));
     }
     if (visits && sales) {
       dispatch(
@@ -243,7 +191,17 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             .reduce((acc, sale) => +sale.price + acc, 0),
         })
       );
-      return;
+      dispatch(
+        initPaint(
+          visits
+            .filter((visit) => visit.paint > 0)
+            .map((visit) => ({
+              id: visit.paintId,
+              employee: visit.employee,
+              value: +visit.paint,
+            }))
+        )
+      );
     }
   };
 

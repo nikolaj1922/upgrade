@@ -7,7 +7,11 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { getUniqId, convertDataToTime } from "@/lib/utils";
 import { useAppDispatch } from "@/hooks/useRedux";
-import { addToVisits, addToGeneral } from "@/redux/slices/cashboxStateSlice";
+import {
+  addToVisits,
+  addToGeneral,
+  addToPaint,
+} from "@/redux/slices/cashboxStateSlice";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
 import MenuItem from "@mui/material/MenuItem";
@@ -21,6 +25,7 @@ type FormData = {
   price: number;
   employee: string;
   payloadType: PayloadType;
+  paint: number;
 };
 
 interface VisitModalProps {
@@ -43,11 +48,13 @@ const VisitModal: FC<VisitModalProps> = ({
     visitTypeState: string;
     priceState: string;
     payloadTypeState: string;
+    paintState: string;
   }>({
     employeeState: "",
     visitTypeState: "",
     priceState: "",
     payloadTypeState: "",
+    paintState: "",
   });
   const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm<FormData>();
@@ -67,15 +74,18 @@ const VisitModal: FC<VisitModalProps> = ({
     !Boolean(validateFormState.employeeState) ||
     !Boolean(validateFormState.payloadTypeState) ||
     !Boolean(validateFormState.priceState) ||
-    !Boolean(validateFormState.visitTypeState);
+    !Boolean(validateFormState.visitTypeState) ||
+    !Boolean(validateFormState.paintState);
 
   const handleCreateVisit = async (data: FormData) => {
     try {
       if (!shiftId) return;
       setIsLoading(true);
+      const paintId = getUniqId();
       await updateDoc(doc(db, "work shifts", shiftId), {
         visits: arrayUnion({
           id: getUniqId(),
+          paintId: paintId,
           ...data,
           timestamp: convertDataToTime(String(new Date())),
         }),
@@ -104,6 +114,15 @@ const VisitModal: FC<VisitModalProps> = ({
           value: data.price,
         })
       );
+      if (data.paint > 0) {
+        dispatch(
+          addToPaint({
+            id: paintId,
+            employee: data.employee,
+            value: data.paint,
+          })
+        );
+      }
       setIsModalOpen(false);
       toast.success("Запись создана.");
     } catch (err) {
@@ -189,6 +208,23 @@ const VisitModal: FC<VisitModalProps> = ({
                       setValidateFormState((prevState) => ({
                         ...prevState,
                         priceState: e.target.value,
+                      }));
+                    },
+                  })}
+                />
+              </div>
+            </div>
+            <div>
+              <div className="visitModal-group">
+                <p>Краска</p>
+                <input
+                  type="number"
+                  className="visitModal-input"
+                  {...register("paint", {
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                      setValidateFormState((prevState) => ({
+                        ...prevState,
+                        paintState: e.target.value,
                       }));
                     },
                   })}

@@ -46,7 +46,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 const CashBoxAccordion: FC<CashBoxAccordionProps> = ({}) => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const { cashboxState } = useAppSelector((state) => state);
-  
+
   const handleChange =
     (panel: string) => (event: SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
@@ -59,15 +59,24 @@ const CashBoxAccordion: FC<CashBoxAccordionProps> = ({}) => {
         onChange={handleChange("panel1")}
       >
         <AccordionSummary aria-controls="panel1bh-content" id="panel1bh-header">
-          <h3 className="text-2xl font-semibold">Общая касса</h3>
+          <h3 className="text-3xl">
+            Общая касса:{" "}
+            <span className="font-semibold">{cashboxState.generalTotal}</span>
+          </h3>
         </AccordionSummary>
         <AccordionDetails>
-          <p className="text-xl font-semibold">
-            Всего: {cashboxState.generalTotal}
+          <p>
+            Наличные:{" "}
+            <span className="font-semibold">{cashboxState.generalCash}</span>
           </p>
-          <p>Наличные: {cashboxState.generalCash}</p>
-          <p>Карта: {cashboxState.generalCard}</p>
-          <p>Каспи: {cashboxState.generalKaspi}</p>
+          <p>
+            Карта:{" "}
+            <span className="font-semibold">{cashboxState.generalCard}</span>
+          </p>
+          <p>
+            Каспи:{" "}
+            <span className="font-semibold">{cashboxState.generalKaspi}</span>
+          </p>
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -75,15 +84,24 @@ const CashBoxAccordion: FC<CashBoxAccordionProps> = ({}) => {
         onChange={handleChange("panel2")}
       >
         <AccordionSummary aria-controls="panel2bh-content" id="panel2bh-header">
-          <h3 className="text-xl">Услуги</h3>
+          <h3 className="text-xl">
+            Услуги:{" "}
+            <span className="font-semibold">{cashboxState.visitsTotal}</span>
+          </h3>
         </AccordionSummary>
         <AccordionDetails>
-          <p className="text-xl font-semibold">
-            Всего: {cashboxState.visitsTotal}
+          <p>
+            Наличные:{" "}
+            <span className="font-semibold">{cashboxState.visitsCash}</span>
           </p>
-          <p>Наличные: {cashboxState.visitsCash}</p>
-          <p>Карта: {cashboxState.visitsCard}</p>
-          <p>Каспи: {cashboxState.visitsKaspi}</p>
+          <p>
+            Карта:{" "}
+            <span className="font-semibold">{cashboxState.visitsCard}</span>
+          </p>
+          <p>
+            Каспи:{" "}
+            <span className="font-semibold">{cashboxState.visitsKaspi}</span>
+          </p>
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -91,15 +109,24 @@ const CashBoxAccordion: FC<CashBoxAccordionProps> = ({}) => {
         onChange={handleChange("panel3")}
       >
         <AccordionSummary aria-controls="panel3bh-content" id="panel3bh-header">
-          <h3 className="text-xl">Продажи</h3>
+          <h3 className="text-xl">
+            Продажи:{" "}
+            <span className="font-semibold">{cashboxState.salesTotal}</span>
+          </h3>
         </AccordionSummary>
         <AccordionDetails>
-          <p className="text-xl font-semibold">
-            Всего: {cashboxState.salesTotal}
+          <p>
+            Наличные:{" "}
+            <span className="font-semibold">{cashboxState.salesCash}</span>
           </p>
-          <p>Наличные: {cashboxState.salesCash}</p>
-          <p>Карта: {cashboxState.salesCard}</p>
-          <p>Каспи: {cashboxState.salesKaspi}</p>
+          <p>
+            Карта:{" "}
+            <span className="font-semibold">{cashboxState.salesCard}</span>
+          </p>
+          <p>
+            Каспи:{" "}
+            <span className="font-semibold">{cashboxState.salesKaspi}</span>
+          </p>
         </AccordionDetails>
       </Accordion>
       <Accordion
@@ -107,10 +134,23 @@ const CashBoxAccordion: FC<CashBoxAccordionProps> = ({}) => {
         onChange={handleChange("panel4")}
       >
         <AccordionSummary aria-controls="panel4bh-content" id="panel4bh-header">
-          <h3 className="text-xl">Краска</h3>
+          <h3 className="text-xl">
+            Краска:{" "}
+            <span className="font-semibold">
+              {cashboxState.paintTotal.reduce(
+                (acc, paint) => acc + +paint.value,
+                0
+              )}
+            </span>
+          </h3>
         </AccordionSummary>
         <AccordionDetails>
-          <p className="text-xl font-semibold">Всего: 0</p>
+          {cashboxState.paintTotal.map((paint) => (
+            <p key={paint.id}>
+              {paint.employee}:{" "}
+              <span className="font-semibold">{paint.value}</span>
+            </p>
+          ))}
         </AccordionDetails>
       </Accordion>
     </div>
