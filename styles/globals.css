@@ -29,11 +29,11 @@
     @apply flex space-x-2 justify-center;
   }
 
-  .visitModal-group {
+  .modal-group {
     @apply flex justify-between items-center space-x-6;
   }
 
-  .visitModal-input {
+  .modal-input {
     @apply h-[30px] w-[160px] rounded focus:outline-none bg-inherit border-b border-r shadow-sm border-zinc-300 pl-1.5;
   }
 }

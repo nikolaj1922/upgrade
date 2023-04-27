@@ -1,39 +1,29 @@
-import { FC, useState, SetStateAction, Dispatch, useEffect } from "react";
+import { FC, useState, SetStateAction, Dispatch } from "react";
 import { db } from "@/lib/firebase";
 import { useForm } from "react-hook-form";
-import {
-  doc,
-  updateDoc,
-  arrayUnion,
-} from "firebase/firestore";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { convertDataToTime, getUniqId } from "@/lib/utils";
-import { addToPaint } from "@/redux/slices/cashboxStateSlice";
+import { addToGeneralShift } from "@/redux/slices/cashboxStateSlice";
 import { useAppDispatch } from "@/hooks/useRedux";
-import { PayloadType } from "@/types/types";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "../ui/Button";
 import Circular from "../ui/CircularProgress";
 import XRedCircleButton from "../ui/XRedCircleButton";
 
 type FormData = {
-  type: string;
-  title?: string;
-  employee?: string;
+  title: string;
   price: number;
-  payloadType: PayloadType;
 };
 
-interface PaintModalProps {
+interface SaleModalProps {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   shiftId: string | null;
 }
 
-const PaintModal: FC<PaintModalProps> = ({
+const GeneralShiftModal: FC<SaleModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
@@ -42,51 +32,34 @@ const PaintModal: FC<PaintModalProps> = ({
   const [validateFormState, setValidateFormState] = useState<{
     titleState: string;
     priceState: string;
-    payloadTypeState: string;
   }>({
     titleState: "",
     priceState: "",
-    payloadTypeState: "",
   });
   const { register, handleSubmit } = useForm<FormData>();
   const dispatch = useAppDispatch();
 
   const handleClose = (): void => setIsModalOpen(false);
-  const checkValidateForm = () => {
-    return (
-      !Boolean(validateFormState.titleState) ||
-      !Boolean(validateFormState.priceState) ||
-      !Boolean(validateFormState.payloadTypeState)
-    );
-  };
+  const checkValidateForm = (): boolean =>
+    !Boolean(validateFormState.priceState) ||
+    !Boolean(validateFormState.titleState);
 
-  const handleCreatePaint = async (data: FormData) => {
+  const handleCreateGeneral = async (data: FormData) => {
     try {
       if (!shiftId) return;
       setIsLoading(true);
       await updateDoc(doc(db, "work shifts", shiftId), {
-        paint: arrayUnion({
+        generalShift: arrayUnion({
           id: getUniqId(),
           ...data,
           timestamp: convertDataToTime(String(new Date())),
         }),
       });
-      dispatch(
-        addToPaint({
-          type: data.payloadType,
-          value: data.price,
-        })
-      );
-      dispatch(
-        addToPaint({
-          type: "total",
-          value: data.price,
-        })
-      );
+      dispatch(addToGeneralShift(data.price));
       setIsModalOpen(false);
-      toast.success("Краска добавлена.");
+      toast.success("Запись создана.");
     } catch (err) {
-      toast.error("Не удалось добавить краску.");
+      toast.error("Не удалось создать запись.");
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +69,7 @@ const PaintModal: FC<PaintModalProps> = ({
     <Modal open={isModalOpen} onClose={handleClose}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-slate-100 shadow-md p-4 focus:outline-none rounded-sm flex flex-col">
         <div className="relative">
-          <MainHeader header="Добавить запись" isModal className="!text-3xl" />
+          <MainHeader header="Новая запись" isModal className="!text-3xl" />
           <XRedCircleButton
             onClick={() => setIsModalOpen(false)}
             className=" ml-9 cursor-pointer absolute top-1.5 right-0"
@@ -104,7 +77,7 @@ const PaintModal: FC<PaintModalProps> = ({
         </div>
         <form
           className="px-8 space-y-8"
-          onSubmit={handleSubmit(handleCreatePaint)}
+          onSubmit={handleSubmit(handleCreateGeneral)}
         >
           <div className="space-y-3">
             <div>
@@ -114,6 +87,7 @@ const PaintModal: FC<PaintModalProps> = ({
                   type="text"
                   className="modal-input"
                   {...register("title", {
+                    required: true,
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       setValidateFormState((prevState) => ({
                         ...prevState,
@@ -141,28 +115,6 @@ const PaintModal: FC<PaintModalProps> = ({
                 />
               </div>
             </div>
-            <div>
-              <div className="modal-group">
-                <p>Тип оплаты</p>
-                <Select
-                  defaultValue=""
-                  displayEmpty
-                  sx={{ height: "30px", width: "160px" }}
-                  {...register("payloadType", {
-                    onChange: (e: SelectChangeEvent) => {
-                      setValidateFormState((prevState) => ({
-                        ...prevState,
-                        payloadTypeState: e.target.value,
-                      }));
-                    },
-                  })}
-                >
-                  <MenuItem value="cash">Наличные</MenuItem>
-                  <MenuItem value="card">Карта</MenuItem>
-                  <MenuItem value="kaspi">Каспи Банк</MenuItem>
-                </Select>
-              </div>
-            </div>
           </div>
           <div className="w-full flex justify-center">
             <Button
@@ -170,7 +122,7 @@ const PaintModal: FC<PaintModalProps> = ({
               type="submit"
               disabled={checkValidateForm()}
             >
-              {isLoading ? <Circular /> : "Добавить"}
+              {isLoading ? <Circular /> : "Создать продажу"}
             </Button>
           </div>
         </form>
@@ -179,4 +131,4 @@ const PaintModal: FC<PaintModalProps> = ({
   );
 };
 
-export default PaintModal;
+export default GeneralShiftModal;

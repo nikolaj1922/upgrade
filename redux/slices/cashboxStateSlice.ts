@@ -3,10 +3,7 @@ import { ICashboxSlice, IPaint, ISale } from "@/types/types";
 import { PayloadType } from "@/types/types";
 
 const initialState: ICashboxSlice = {
-  generalTotal: 0,
-  generalCash: 0,
-  generalCard: 0,
-  generalKaspi: 0,
+  generalShiftTotal: 0,
   visitsTotal: 0,
   visitsCash: 0,
   visitsCard: 0,
@@ -26,28 +23,8 @@ const cashboxStateSlice = createSlice({
   name: "cashbox",
   initialState,
   reducers: {
-    initGeneral: (
-      state,
-      action: PayloadAction<{ type: PayloadType; value: number }>
-    ) => {
-      if (action.payload.type === "signIn") {
-        state.generalTotal = +action.payload.value;
-        state.generalCard = +action.payload.value;
-        state.generalCash = +action.payload.value;
-        state.generalKaspi = +action.payload.value;
-      }
-      if (action.payload.type === "total") {
-        state.generalTotal = +action.payload.value;
-      }
-      if (action.payload.type === "cash") {
-        state.generalCash = +action.payload.value;
-      }
-      if (action.payload.type === "card") {
-        state.generalCard = +action.payload.value;
-      }
-      if (action.payload.type === "kaspi") {
-        state.generalKaspi = +action.payload.value;
-      }
+    initGeneralShift: (state, action: PayloadAction<number>) => {
+      state.generalShiftTotal = +action.payload;
     },
     initVisits: (
       state,
@@ -124,39 +101,11 @@ const cashboxStateSlice = createSlice({
     ) => {
       state.employeeSalaryPaint = action.payload;
     },
-    addToGeneral: (
-      state,
-      action: PayloadAction<{ type: PayloadType; value: number }>
-    ) => {
-      if (action.payload.type === "total") {
-        state.generalTotal += +action.payload.value;
-      }
-      if (action.payload.type === "cash") {
-        state.generalCash += +action.payload.value;
-      }
-      if (action.payload.type === "card") {
-        state.generalCard += +action.payload.value;
-      }
-      if (action.payload.type === "kaspi") {
-        state.generalKaspi += +action.payload.value;
-      }
+    addToGeneralShift: (state, action: PayloadAction<number>) => {
+      state.generalShiftTotal += +action.payload;
     },
-    subFromGeneral: (
-      state,
-      action: PayloadAction<{ type: PayloadType; value: number }>
-    ) => {
-      if (action.payload.type === "total" && state.generalTotal >= 0) {
-        state.generalTotal -= +action.payload.value;
-      }
-      if (action.payload.type === "cash" && state.generalCash >= 0) {
-        state.generalCash -= +action.payload.value;
-      }
-      if (action.payload.type === "card" && state.generalCard >= 0) {
-        state.generalCard -= +action.payload.value;
-      }
-      if (action.payload.type === "kaspi" && state.generalKaspi >= 0) {
-        state.generalKaspi -= +action.payload.value;
-      }
+    subFromGeneralShift: (state, action: PayloadAction<number>) => {
+      state.generalShiftTotal -= +action.payload;
     },
     addToVisits: (
       state,
@@ -240,7 +189,7 @@ const cashboxStateSlice = createSlice({
         state.paintCard += +action.payload.value;
       }
       if (action.payload.type === "kaspi") {
-        state.generalKaspi += +action.payload.value;
+        state.paintKaspi += +action.payload.value;
       }
     },
     subFromPaint: (
@@ -257,7 +206,7 @@ const cashboxStateSlice = createSlice({
         state.paintCard -= +action.payload.value;
       }
       if (action.payload.type === "kaspi" && state.paintKaspi >= 0) {
-        state.generalKaspi -= +action.payload.value;
+        state.paintKaspi -= +action.payload.value;
       }
     },
     addToEmployeeSalaryPaint: (
@@ -279,13 +228,13 @@ const cashboxStateSlice = createSlice({
 });
 
 export const {
-  initGeneral,
+  initGeneralShift,
   initEmployeeSalaryPaint,
   initSalesMen,
   initVisits,
   initPaint,
-  addToGeneral,
-  subFromGeneral,
+  addToGeneralShift,
+  subFromGeneralShift,
   addToVisits,
   subFromVisits,
   addToSalesMen,

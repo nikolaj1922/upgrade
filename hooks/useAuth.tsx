@@ -25,18 +25,30 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { IAdmin, IPaint, ISalary, ISale, IVisit } from "@/types/types";
+import {
+  IAdmin,
+  IGeneral,
+  IPaint,
+  ISalary,
+  ISale,
+  IVisit,
+} from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
 import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
 import {
-  initGeneral,
+  initGeneralShift,
   initEmployeeSalaryPaint,
   initSalesMen,
   initVisits,
   initPaint,
 } from "@/redux/slices/cashboxStateSlice";
 import { initSalary } from "@/redux/slices/salaryStateSlice";
+import {
+  setPaintStartSum,
+  setSalesMStartSum,
+  setGeneralShiftStartSum,
+} from "@/redux/slices/startSumStateSlice";
 
 export interface IAuth {
   admin: IAdmin | null;
@@ -65,15 +77,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     isSignIn: boolean,
     visits?: IVisit[],
     salesMen?: ISale[],
-    paint?: IPaint[]
+    paint?: IPaint[],
+    generalShift?: IGeneral[],
+    paintStartSum?: number,
+    salesMStartSum?: number,
+    shiftGeneralStartSum?: number
   ) => {
     if (isSignIn) {
-      dispatch(
-        initGeneral({
-          type: "signIn",
-          value: 0,
-        })
-      );
+      dispatch(initGeneralShift(0));
       dispatch(
         initVisits({
           type: "signIn",
@@ -92,58 +103,25 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           value: 0,
         })
       );
+      dispatch(setPaintStartSum(0));
+      dispatch(setSalesMStartSum(0));
+      dispatch(setGeneralShiftStartSum(0));
       dispatch(initEmployeeSalaryPaint([]));
       dispatch(initSalary([]));
     }
-    if (visits && salesMen && paint) {
+    if (visits && salesMen && paint && generalShift) {
       const salary: Array<ISalary> = visits.map((visit) => ({
         employee: visit.employee,
         revenue: visit.price,
       }));
       dispatch(initSalary(salary));
+      dispatch(setPaintStartSum(paintStartSum!));
+      dispatch(setSalesMStartSum(salesMStartSum!));
+      dispatch(setGeneralShiftStartSum(shiftGeneralStartSum!));
       dispatch(
-        initGeneral({
-          type: "total",
-          value:
-            visits.reduce((acc, visit) => +visit.price + acc, 0) +
-            salesMen.reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "card",
-          value:
-            visits
-              .filter((visit) => visit.payloadType === "card")
-              .reduce((acc, visit) => +visit.price + acc, 0) +
-            salesMen
-              .filter((sale) => sale.payloadType === "card")
-              .reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "cash",
-          value:
-            visits
-              .filter((visit) => visit.payloadType === "cash")
-              .reduce((acc, visit) => +visit.price + acc, 0) +
-            salesMen
-              .filter((sale) => sale.payloadType === "cash")
-              .reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initGeneral({
-          type: "kaspi",
-          value:
-            visits
-              .filter((visit) => visit.payloadType === "kaspi")
-              .reduce((acc, visit) => +visit.price + acc, 0) +
-            salesMen
-              .filter((sale) => sale.payloadType === "kaspi")
-              .reduce((acc, sale) => +sale.price + acc, 0),
-        })
+        initGeneralShift(
+          generalShift.reduce((acc, general) => +general.price + acc, 0)
+        )
       );
       dispatch(
         initVisits({
@@ -266,7 +244,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
               false,
               shiftParsedDoc?.visits as IVisit[],
               shiftParsedDoc?.salesMen as ISale[],
-              shiftParsedDoc?.paint as IPaint[]
+              shiftParsedDoc?.paint as IPaint[],
+              shiftParsedDoc?.generalShift as IGeneral[],
+              shiftParsedDoc?.paintStartSum,
+              shiftParsedDoc?.salesMStartSum,
+              shiftParsedDoc?.shiftGeneralStartSum
             );
           }
         } else {
@@ -297,6 +279,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           visits: [],
           salesMen: [],
           paint: [],
+          generalShift: [],
+          paintStartSum: 0,
+          salesMStartSum: 0,
+          shiftGeneralStartSum: 0,
           timestamp: serverTimestamp(),
         });
         localStorage.setItem(
@@ -306,10 +292,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             timestamp: new Date(),
           })
         );
+        initCashState(true);
         dispatch(
           setShift({ shiftId: docId.id, timestamp: String(new Date()) })
         );
-        initCashState(true);
         toast.success("Администратор создан!", {
           duration: 4500,
         });
@@ -348,6 +334,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         visits: [],
         salesMen: [],
         paint: [],
+        generalShift: [],
+        paintStartSum: 0,
+        salesMStartSum: 0,
+        shiftGeneralStartSum: 0,
         timestamp: serverTimestamp(),
       });
       localStorage.setItem(
@@ -357,8 +347,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           timestamp: new Date(),
         })
       );
-      dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
       initCashState(true);
+      dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
       router.push("/");
     } catch (err) {
       if (err instanceof FirebaseError) {

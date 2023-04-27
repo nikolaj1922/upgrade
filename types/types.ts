@@ -48,10 +48,7 @@ export interface IEmployee {
 }
 
 export interface ICashboxSlice {
-  generalTotal: number;
-  generalCash: number;
-  generalCard: number;
-  generalKaspi: number;
+  generalShiftTotal: number;
   visitsTotal: number;
   visitsCash: number;
   visitsCard: number;
@@ -80,6 +77,14 @@ export interface IPaint {
   id: string;
   payloadType: PayloadType;
   employee: string;
+  title: string;
+  price: number;
+  timestamp: string;
+  type: string;
+}
+
+export interface IGeneral {
+  id: string;
   title: string;
   price: number;
   timestamp: string;

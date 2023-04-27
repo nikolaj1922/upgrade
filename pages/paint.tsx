@@ -5,48 +5,56 @@ import PaintModal from "@/components/modals/PaintModal";
 import { useAppSelector } from "@/hooks/useRedux";
 import { db } from "@/lib/firebase";
 import { IPaint } from "@/types/types";
-import { DocumentData, doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { FC, useState, useEffect } from "react";
+import { setPaintStartSum } from "@/redux/slices/startSumStateSlice";
 
-interface dyeProps {}
+interface DyeProps {}
 
-const Paint: FC<dyeProps> = ({}) => {
+const Paint: FC<DyeProps> = ({}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [sortSelect, setSortSelect] = useState<string>("");
-  const [paint, setPaint] = useState<IPaint[] | DocumentData[] | null>(null);
   const { shiftId } = useAppSelector((state) => state.shiftState);
-  const { paintTotal } = useAppSelector((state) => state.cashboxState);
-
-  console.log(paintTotal);
+  const [paint, setPaint] = useState<IPaint[] | null>(null);
+  const { paintStartSum } = useAppSelector((state) => state.startSumState);
 
   const sortData = [
     { value: "", title: "Не выбрано" },
     {
-      value: "price",
-      title: "Цена",
-    },
-    {
-      value: "payload",
-      title: "Тип оплаты",
+      value: "type",
+      title: "Тип",
     },
   ];
 
-  console.log(paint);
+  const sortPaint = (sortSetting: string, paint: IPaint[]): IPaint[] => {
+    if (!sortSetting) return paint;
+    if (sortSetting === "type") {
+      console.log("sort");
+      const sortedArray = paint.sort((a, b) =>
+        a.payloadType.localeCompare(b.payloadType)
+      );
+      return sortedArray;
+    }
+    return paint;
+  };
 
   useEffect(() => {
     const paintSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
         const data = snapshot.data();
-        const paintArray: Array<IPaint> = data?.paint;
-        if (!paintArray) return;
-        setPaint(paintArray.reverse());
+        const dataPaintArray: Array<IPaint> = data?.paint;
+        if (!dataPaintArray) return;
+        if (!sortSelect) {
+          setPaint(dataPaintArray.reverse());
+        }
+        setPaint(sortPaint(sortSelect, dataPaintArray));
       });
     };
     paintSubscribe();
 
     return () => paintSubscribe();
-  }, [db, shiftId]);
+  }, [db, shiftId, sortSelect]);
 
   return (
     <main>
@@ -55,8 +63,16 @@ const Paint: FC<dyeProps> = ({}) => {
         setIsModalOpen={setIsModalOpen}
         setSortSelect={setSortSelect}
         sortItems={sortData}
+        needStartSum
+        startSum={paintStartSum}
+        setStartSum={setPaintStartSum}
+        updateDocKey="paint"
       />
-      <Container dataType="paint" paint={paint as IPaint[]} />
+      <Container
+        dataType="paint"
+        paint={paint as IPaint[]}
+        checkedSum={paintStartSum}
+      />
       {isModalOpen && (
         <PaintModal
           isModalOpen={isModalOpen}

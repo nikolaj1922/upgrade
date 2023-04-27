@@ -7,6 +7,7 @@ import MainHeader from "@/components/Header";
 import AddAndSortSection from "@/components/AddAndSortSection";
 import Container from "@/components/container/Container";
 import SaleModal from "@/components/modals/SaleModal";
+import { setSalesMStartSum } from "@/redux/slices/startSumStateSlice";
 
 interface salesProps {}
 
@@ -26,6 +27,7 @@ const Sales: FC<salesProps> = ({}) => {
     },
   ];
   const { shiftId } = useAppSelector((state) => state.shiftState);
+  const { salesMStartSum } = useAppSelector((state) => state.startSumState);
 
   const sortSales = (sortSetting: string, sales: ISale[]): ISale[] => {
     if (!sortSetting) return sales;
@@ -68,8 +70,12 @@ const Sales: FC<salesProps> = ({}) => {
         setIsModalOpen={setIsModalOpen}
         setSortSelect={setSortSelect}
         sortItems={sortData}
+        needStartSum
+        startSum={salesMStartSum}
+        setStartSum={setSalesMStartSum}
+        updateDocKey="salesM"
       />
-      <Container dataType="salesMen" salesMen={sales as ISale[]} />
+      <Container dataType="salesMen" salesMen={sales as ISale[]} checkedSum={salesMStartSum} />
       {isModalOpen && (
         <SaleModal
           isModalOpen={isModalOpen}

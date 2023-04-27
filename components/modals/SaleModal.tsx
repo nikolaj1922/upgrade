@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { convertDataToTime, getUniqId } from "@/lib/utils";
-import { addToSalesMen, addToGeneral } from "@/redux/slices/cashboxStateSlice";
+import { addToSalesMen } from "@/redux/slices/cashboxStateSlice";
 import { useAppDispatch } from "@/hooks/useRedux";
 import { PayloadType } from "@/types/types";
 import Modal from "@mui/material/Modal";
@@ -74,18 +74,6 @@ const SaleModal: FC<SaleModalProps> = ({
           value: data.price,
         })
       );
-      dispatch(
-        addToGeneral({
-          type: data.payloadType,
-          value: data.price,
-        })
-      );
-      dispatch(
-        addToGeneral({
-          type: "total",
-          value: data.price,
-        })
-      );
       setIsModalOpen(false);
       toast.success("Продажа создана.");
     } catch (err) {
@@ -111,11 +99,11 @@ const SaleModal: FC<SaleModalProps> = ({
         >
           <div className="space-y-3">
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Наименование</p>
                 <input
                   type="text"
-                  className="visitModal-input"
+                  className="modal-input"
                   {...register("title", {
                     required: true,
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,11 +117,11 @@ const SaleModal: FC<SaleModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Цена</p>
                 <input
                   type="number"
-                  className="visitModal-input"
+                  className="modal-input"
                   {...register("price", {
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       setValidateFormState((prevState) => ({
@@ -146,7 +134,7 @@ const SaleModal: FC<SaleModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Тип оплаты</p>
                 <Select
                   defaultValue=""

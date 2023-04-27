@@ -9,8 +9,8 @@ import { getUniqId, convertDataToTime } from "@/lib/utils";
 import { useAppDispatch } from "@/hooks/useRedux";
 import {
   addToVisits,
-  addToGeneral,
   addToEmployeeSalaryPaint,
+  addToPaint,
 } from "@/redux/slices/cashboxStateSlice";
 import Modal from "@mui/material/Modal";
 import MainHeader from "../Header";
@@ -109,19 +109,23 @@ const VisitModal: FC<VisitModalProps> = ({
           value: data.price,
         })
       );
-      dispatch(
-        addToGeneral({
-          type: data.payloadType,
-          value: data.price,
-        })
-      );
-      dispatch(
-        addToGeneral({
-          type: "total",
-          value: data.price,
-        })
-      );
       if (data.paint > 0) {
+        const paintItem = {
+          id: paintId,
+          employee: data.employee,
+          type: "visit",
+          price: data.paint,
+          timestamp: convertDataToTime(String(new Date())),
+        };
+        await updateDoc(doc(db, "work shifts", shiftId), {
+          paint: arrayUnion(paintItem),
+        });
+        dispatch(
+          addToPaint({
+            type: "total",
+            value: data.paint,
+          })
+        );
         dispatch(
           addToEmployeeSalaryPaint({
             id: paintId,
@@ -155,7 +159,7 @@ const VisitModal: FC<VisitModalProps> = ({
         >
           <div className="space-y-3">
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Мастер</p>
                 <Select
                   defaultValue=""
@@ -187,11 +191,11 @@ const VisitModal: FC<VisitModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Услуга</p>
                 <input
                   type="text"
-                  className="visitModal-input"
+                  className="modal-input"
                   {...register("visitType", {
                     required: true,
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,11 +209,11 @@ const VisitModal: FC<VisitModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Цена</p>
                 <input
                   type="number"
-                  className="visitModal-input"
+                  className="modal-input"
                   {...register("price", {
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       setValidateFormState((prevState) => ({
@@ -222,11 +226,11 @@ const VisitModal: FC<VisitModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Краска</p>
                 <input
                   type="number"
-                  className="visitModal-input"
+                  className="modal-input"
                   {...register("paint", {
                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                       setValidateFormState((prevState) => ({
@@ -239,7 +243,7 @@ const VisitModal: FC<VisitModalProps> = ({
               </div>
             </div>
             <div>
-              <div className="visitModal-group">
+              <div className="modal-group">
                 <p>Тип оплаты</p>
                 <Select
                   defaultValue=""

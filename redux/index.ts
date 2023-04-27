@@ -3,6 +3,7 @@ import formStateReducer from "./slices/formStateSlice";
 import shiftStateReducer from "./slices/shiftStateSlice";
 import cashboxStateReducer from "./slices/cashboxStateSlice";
 import salaryStateReducer from "./slices/salaryStateSlice";
+import startSumStateReducer from './slices/startSumStateSlice'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     shiftState: shiftStateReducer,
     cashboxState: cashboxStateReducer,
     salaryState: salaryStateReducer,
+    startSumState: startSumStateReducer
   },
 });
 
