@@ -7,7 +7,7 @@ interface cashboxProps {}
 const cashbox: FC<cashboxProps> = ({}) => {
   return (
     <main>
-      <MainHeader header="Касса" />
+      <MainHeader header="Отчет о смене" />
       <CashBoxAccordion />
     </main>
   );

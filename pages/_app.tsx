@@ -10,6 +10,8 @@ import { store } from "@/redux";
 import { Toaster } from "react-hot-toast";
 import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -21,7 +23,7 @@ type AppPropsWithLayout = AppProps & {
 
 const progress = new ProgressBar({
   size: 4,
-  color: "#16a34a",
+  color: "#818cf8",
   className: "z-50",
   delay: 100,
 });
@@ -33,20 +35,22 @@ Router.events.on("routeChangeError", progress.finish);
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <div className="h-screen">
-      <Toaster position="top-center" reverseOrder={false} />
-      <Background />
-      <Provider store={store}>
-        <AuthProvider>
-          {Component.getLayout ? (
-            <Component {...pageProps} />
-          ) : (
-            <div className="w-[80%] h-[600px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
-              <Sidebar />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Toaster position="top-center" reverseOrder={false} />
+        <Background />
+        <Provider store={store}>
+          <AuthProvider>
+            {Component.getLayout ? (
               <Component {...pageProps} />
-            </div>
-          )}
-        </AuthProvider>
-      </Provider>
+            ) : (
+              <div className="w-[80%] h-[600px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
+                <Sidebar />
+                <Component {...pageProps} />
+              </div>
+            )}
+          </AuthProvider>
+        </Provider>
+      </LocalizationProvider>
     </div>
   );
 }

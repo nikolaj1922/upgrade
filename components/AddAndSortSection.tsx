@@ -17,6 +17,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { toast } from "react-hot-toast";
+import {
+  setGeneralShiftStartSum,
+  setPaintStartSum,
+  setSalesMStartSum,
+} from "@/redux/slices/startSumStateSlice";
 
 interface AddAndSortSectionProps {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -65,16 +70,19 @@ const AddAndSortSection: FC<AddAndSortSectionProps> = ({
       setStartSum && dispatch(setStartSum(currentSum));
       setIsChangeSum(false);
       if (updateDocKey === "paint") {
+        dispatch(setPaintStartSum(currentSum));
         await updateDoc(doc(db, "work shifts", shiftId), {
           paintStartSum: currentSum,
         });
       }
       if (updateDocKey === "salesM") {
+        dispatch(setSalesMStartSum(currentSum));
         await updateDoc(doc(db, "work shifts", shiftId), {
           salesMStartSum: currentSum,
         });
       }
       if (updateDocKey === "shiftGeneral") {
+        dispatch(setGeneralShiftStartSum(currentSum));
         await updateDoc(doc(db, "work shifts", shiftId), {
           shiftGeneralStartSum: currentSum,
         });
@@ -124,7 +132,7 @@ const AddAndSortSection: FC<AddAndSortSectionProps> = ({
               <input
                 ref={inputChangeSumRef}
                 type="number"
-                className="pl-2 w-[100px] rounded focus:outline-none"
+                className="pl-2 w-[100px] rounded focus:outline-none border-b border-r shadow-sm border-zinc-300"
                 autoFocus
                 onChange={(e) => {
                   setCurrentSum(+e.target.value);

@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useRef } from "react";
 import {
   FormControl,
   MenuItem,
@@ -9,26 +9,37 @@ import {
 interface ContainerItemSalaryProps {
   employee: string;
   revenue: number;
+  paint: number;
 }
 
 const ContainerItemSalary: FC<ContainerItemSalaryProps> = ({
   employee,
   revenue,
+  paint,
 }) => {
   const [percentValue, setPercentValue] = useState<number>(0.5);
+  const [subValue, setSubValue] = useState<number>(+paint);
   const handleSetSelect = (e: SelectChangeEvent) =>
     setPercentValue(+e.target.value);
 
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
-      <div className="w-11/12 flex justify-between items-center space-x-8 px-1">
+      <div className="w-full flex justify-between items-center space-x-8 px-4">
         <div className="container-item justify-start w-[170px]">
           <span>Мастер: </span>
           <span className="font-semibold">{employee}</span>
         </div>
         <div className="container-item justify-start">
           <span>Выручка: </span>
-          <span className="font-semibold">{revenue}</span>
+          <div className="font-semibold">
+            {revenue} -{" "}
+            <input
+              type="number"
+              value={subValue || ""}
+              onChange={(e) => setSubValue(+e.target.value)}
+              className="w-[70px] rounded focus:outline-none bg-inherit border-b border-r shadow-sm border-zinc-300 pl-1.5"
+            />
+          </div>
         </div>
         <div className="container-item">
           <FormControl>
@@ -57,7 +68,7 @@ const ContainerItemSalary: FC<ContainerItemSalaryProps> = ({
         <div className="container-item">
           <span>Зарплата: </span>
           <span className="font-semibold">
-            {Math.round(revenue * percentValue)}
+            {Math.round((revenue - subValue) * percentValue)}
           </span>
         </div>
       </div>

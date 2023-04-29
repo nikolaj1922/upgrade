@@ -1,5 +1,13 @@
 import { FC } from "react";
-import { IVisit, ISale, ISalary, IPaint, IGeneral } from "@/types/types";
+import {
+  IVisit,
+  ISale,
+  ISalary,
+  IPaint,
+  IGeneral,
+  IArchiveData,
+  IEmployee,
+} from "@/types/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { toast } from "react-hot-toast";
@@ -18,6 +26,9 @@ import { reduceSalary } from "@/redux/slices/salaryStateSlice";
 import ContainerItemSalary from "./ContainerItemSalary";
 import ContainerItemPaint from "./ContainerItemPaint";
 import ContainerItemGeneral from "./ContainerItemGeneral";
+import ContainerArchive from "./ContainerArchive";
+import ContainerItemEmployee from "./ContainerItemEmployee";
+import { emit } from "process";
 
 interface ContainerProps {
   visits?: IVisit[];
@@ -26,7 +37,16 @@ interface ContainerProps {
   paint?: IPaint[];
   generalShift?: IGeneral[];
   checkedSum?: number;
-  dataType: "visits" | "salesMen" | "salary" | "paint" | "general";
+  archiveData?: IArchiveData[];
+  employees?: IEmployee[];
+  dataType:
+    | "visits"
+    | "salesMen"
+    | "salary"
+    | "paint"
+    | "general"
+    | "archive"
+    | "employees";
 }
 
 type SubFrom = "visits" | "salesMen" | "paint" | "general";
@@ -39,6 +59,8 @@ const Container: FC<ContainerProps> = ({
   generalShift,
   dataType,
   checkedSum,
+  archiveData,
+  employees,
 }) => {
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const dispatch = useAppDispatch();
@@ -108,12 +130,12 @@ const Container: FC<ContainerProps> = ({
       return;
     }
   };
-
   const handleDeleteItem = async (
     id: string,
     paintId?: string,
     employee?: string,
-    value?: number
+    value?: number,
+    paintValue?: number
   ) => {
     try {
       if (!shiftId) return;
@@ -132,11 +154,12 @@ const Container: FC<ContainerProps> = ({
           paint: updatedPaintArray,
         });
         subFromCashState(id, "visits", paintId);
-        if (employee && value) {
+        if (employee && value && paintValue) {
           dispatch(
             reduceSalary({
               employee,
               value,
+              paintValue,
             })
           );
         }
@@ -154,6 +177,7 @@ const Container: FC<ContainerProps> = ({
       }
       if (dataType === "paint") {
         const updatedArray = paint?.filter((item) => item.id !== id);
+
         await updateDoc(doc(db, "work shifts", shiftId), {
           paint: updatedArray,
         });
@@ -168,6 +192,22 @@ const Container: FC<ContainerProps> = ({
   };
 
   const render = () => {
+    if (dataType === "employees") {
+      if (!employees) return <Circular size={40} className="mt-5" />;
+      if (!employees.length)
+        return (
+          <h2 className="text-3xl text-center mt-4">Мастера не найдены</h2>
+        );
+      return employees?.map((emp) => (
+        <ContainerItemEmployee key={emp.id} id={emp.id} name={emp.name} />
+      ));
+    }
+    if (dataType === "archive") {
+      if (!archiveData) return <Circular size={40} className="mt-5" />;
+      if (!archiveData.length)
+        return <h2 className="text-3xl text-center mt-4">Смена не найдена</h2>;
+      return <ContainerArchive data={archiveData[0]} />;
+    }
     if (dataType === "general") {
       if (!generalShift) return <Circular size={40} className="mt-5" />;
       if (!checkedSum)
@@ -207,8 +247,6 @@ const Container: FC<ContainerProps> = ({
         />
       ));
     }
-    console.log(checkedSum);
-
     if (dataType === "salary") {
       if (!salary) return <Circular size={40} className="mt-5" />;
       if (!salary.length)
@@ -222,6 +260,7 @@ const Container: FC<ContainerProps> = ({
           key={salary.employee}
           employee={salary.employee}
           revenue={salary.revenue}
+          paint={salary.paint}
         />
       ));
     }
@@ -233,6 +272,7 @@ const Container: FC<ContainerProps> = ({
         <ContainerItemVisit
           key={item.id}
           id={item.id}
+          paint={item.paint}
           paintId={item.paintId}
           employee={item.employee}
           price={item.price}
@@ -268,7 +308,7 @@ const Container: FC<ContainerProps> = ({
   };
 
   return (
-    <div className="bg-white h-full rounded-md p-4 space-y-2 overflow-y-scroll shadow-sm">
+    <div className="bg-white w-full h-full rounded-md p-4 space-y-2 overflow-y-scroll shadow-sm">
       {render()}
     </div>
   );

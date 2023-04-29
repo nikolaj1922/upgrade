@@ -45,6 +45,7 @@ export interface IWorkShift {
 
 export interface IEmployee {
   name: string;
+  id: string;
 }
 
 export interface ICashboxSlice {
@@ -71,6 +72,7 @@ export interface ICashboxSlice {
 export interface ISalary {
   employee: string;
   revenue: number;
+  paint: number;
 }
 
 export interface IPaint {
@@ -88,4 +90,19 @@ export interface IGeneral {
   title: string;
   price: number;
   timestamp: string;
+}
+
+export interface IArchiveData {
+  admin: string;
+  generalShift: IGeneral[];
+  paint: IPaint[];
+  paintStartSum: number;
+  salesMStartSum: number;
+  shiftGeneralStartSum: number;
+  paintEndSum: number;
+  salesMEndSum: number;
+  shiftGeneralEndSum: number;
+  salesMen: ISale[];
+  timestamp: string;
+  visits: IVisit[];
 }

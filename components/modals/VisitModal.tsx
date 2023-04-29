@@ -60,15 +60,13 @@ const VisitModal: FC<VisitModalProps> = ({
   const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm<FormData>();
 
-  useEffect(() => {
-    const employeesSubscribe = (): void => {
-      onSnapshot(collection(db, "employees"), (snapshot) => {
-        setAllEmployees(snapshot.docs.map((doc) => doc.data()));
-      });
-    };
-    employeesSubscribe();
-    return () => employeesSubscribe();
-  }, [db]);
+  useEffect(
+    () =>
+      onSnapshot(collection(db, "employees"), (snapshot) =>
+        setAllEmployees(snapshot.docs.map((doc) => doc.data()))
+      ),
+    [db]
+  );
 
   const handleClose = (): void => setIsModalOpen(false);
   const checkValidateForm = (): boolean =>
@@ -94,7 +92,8 @@ const VisitModal: FC<VisitModalProps> = ({
       dispatch(
         addSalary({
           employee: data.employee,
-          value: data.price,
+          value: +data.price,
+          paintValue: +data.paint,
         })
       );
       dispatch(
@@ -183,7 +182,7 @@ const VisitModal: FC<VisitModalProps> = ({
                   })}
                 >
                   {allEmployees.map((employee) => (
-                    <MenuItem key={employee.name} value={employee.name}>
+                    <MenuItem key={employee.id} value={employee.name}>
                       {employee.name}
                     </MenuItem>
                   ))}

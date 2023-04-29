@@ -22,8 +22,8 @@ import {
   collection,
   doc,
   getDoc,
-  serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import {
   IAdmin,
@@ -34,7 +34,7 @@ import {
   IVisit,
 } from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
-import { useAppDispatch } from "./useRedux";
+import { useAppDispatch, useAppSelector } from "./useRedux";
 import toast from "react-hot-toast";
 import {
   initGeneralShift,
@@ -49,6 +49,7 @@ import {
   setSalesMStartSum,
   setGeneralShiftStartSum,
 } from "@/redux/slices/startSumStateSlice";
+import { getFullDate } from "@/lib/utils";
 
 export interface IAuth {
   admin: IAdmin | null;
@@ -72,9 +73,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  
 
   const initCashState = (
-    isSignIn: boolean,
     visits?: IVisit[],
     salesMen?: ISale[],
     paint?: IPaint[],
@@ -83,36 +84,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     salesMStartSum?: number,
     shiftGeneralStartSum?: number
   ) => {
-    if (isSignIn) {
-      dispatch(initGeneralShift(0));
-      dispatch(
-        initVisits({
-          type: "signIn",
-          value: 0,
-        })
-      );
-      dispatch(
-        initSalesMen({
-          type: "signIn",
-          value: 0,
-        })
-      );
-      dispatch(
-        initPaint({
-          type: "signIn",
-          value: 0,
-        })
-      );
-      dispatch(setPaintStartSum(0));
-      dispatch(setSalesMStartSum(0));
-      dispatch(setGeneralShiftStartSum(0));
-      dispatch(initEmployeeSalaryPaint([]));
-      dispatch(initSalary([]));
-    }
     if (visits && salesMen && paint && generalShift) {
       const salary: Array<ISalary> = visits.map((visit) => ({
         employee: visit.employee,
         revenue: visit.price,
+        paint: visit.paint,
       }));
       dispatch(initSalary(salary));
       dispatch(setPaintStartSum(paintStartSum!));
@@ -227,6 +203,33 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const clearCashState = () => {
+    dispatch(initGeneralShift(0));
+    dispatch(
+      initVisits({
+        type: "signIn",
+        value: 0,
+      })
+    );
+    dispatch(
+      initSalesMen({
+        type: "signIn",
+        value: 0,
+      })
+    );
+    dispatch(
+      initPaint({
+        type: "signIn",
+        value: 0,
+      })
+    );
+    dispatch(setPaintStartSum(0));
+    dispatch(setSalesMStartSum(0));
+    dispatch(setGeneralShiftStartSum(0));
+    dispatch(initEmployeeSalaryPaint([]));
+    dispatch(initSalary([]));
+  };
+
   useEffect(
     () =>
       onAuthStateChanged(auth, async (user) => {
@@ -241,7 +244,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             const shiftDoc = await getDoc(doc(db, "work shifts", shift.id));
             const shiftParsedDoc = shiftDoc.data();
             initCashState(
-              false,
               shiftParsedDoc?.visits as IVisit[],
               shiftParsedDoc?.salesMen as ISale[],
               shiftParsedDoc?.paint as IPaint[],
@@ -280,10 +282,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           salesMen: [],
           paint: [],
           generalShift: [],
+          salary: [],
           paintStartSum: 0,
           salesMStartSum: 0,
           shiftGeneralStartSum: 0,
-          timestamp: serverTimestamp(),
+          archiveTimestamp: getFullDate(String(new Date()), true),
+          timestamp: String(new Date()),
         });
         localStorage.setItem(
           "shift",
@@ -292,7 +296,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
             timestamp: new Date(),
           })
         );
-        initCashState(true);
         dispatch(
           setShift({ shiftId: docId.id, timestamp: String(new Date()) })
         );
@@ -338,7 +341,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         paintStartSum: 0,
         salesMStartSum: 0,
         shiftGeneralStartSum: 0,
-        timestamp: serverTimestamp(),
+        archiveTimestamp: getFullDate(String(new Date()), true),
+        timestamp: String(new Date()),
       });
       localStorage.setItem(
         "shift",
@@ -347,7 +351,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
           timestamp: new Date(),
         })
       );
-      initCashState(true);
       dispatch(setShift({ shiftId: docId.id, timestamp: String(new Date()) }));
       router.push("/");
     } catch (err) {
@@ -378,9 +381,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       setIsLoading(true);
       await signOut(auth);
       setAdmin(null);
-      localStorage.removeItem("shiftId");
+      localStorage.clear();
       dispatch(clearShift());
+      clearCashState();
     } catch (err) {
+      console.log(err);
       toast.error("Проблемы с соединением. Попробуйте еще раз.", {
         duration: 4500,
       });

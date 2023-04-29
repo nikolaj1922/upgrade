@@ -15,13 +15,13 @@ const StartSumSlice = createSlice({
   initialState,
   reducers: {
     setSalesMStartSum: (state, action: PayloadAction<number>) => {
-      state.salesMStartSum = action.payload;
+      state.salesMStartSum = +action.payload;
     },
     setPaintStartSum: (state, action: PayloadAction<number>) => {
-      state.paintStartSum = action.payload;
+      state.paintStartSum = +action.payload;
     },
     setGeneralShiftStartSum: (state, action: PayloadAction<number>) => {
-      state.generalShiftStartSum = action.payload;
+      state.generalShiftStartSum = +action.payload;
     },
   },
 });

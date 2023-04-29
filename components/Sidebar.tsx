@@ -3,12 +3,12 @@ import {
   CurrencyDollarIcon,
   BanknotesIcon,
   ScissorsIcon,
-  ShoppingBagIcon,
   TagIcon,
   CalendarDaysIcon,
   CheckCircleIcon,
   PaintBrushIcon,
   CircleStackIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Menu, MenuItem } from "@mui/material";
 import { updateDoc, doc, onSnapshot } from "firebase/firestore";
@@ -29,6 +29,7 @@ import SidebarLink from "./SidebarLink";
 import Button from "./ui/LoginButton";
 import useAuth from "@/hooks/useAuth";
 import Circular from "./ui/CircularProgress";
+import { useAppSelector } from "@/hooks/useRedux";
 
 interface SidebarProps {}
 
@@ -41,6 +42,8 @@ const Sidebar: FC<SidebarProps> = ({}) => {
   const [currentName, setCurrentName] = useState<string>("");
   const [editedNameIsLoading, setEditedNameIsLoading] =
     useState<boolean>(false);
+
+  const { cashboxState, startSumState } = useAppSelector((state) => state);
   const inputChangeNameRef = useRef<HTMLInputElement | null>(null);
   const buttonChangeNameRef = useRef<HTMLButtonElement | null>(null);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
@@ -203,28 +206,57 @@ const Sidebar: FC<SidebarProps> = ({}) => {
           )}
         </div>
       </div>
-      <div className="flex flex-col space-y-8 mb-12">
+      <div className="flex flex-col space-y-6 mb-8">
         <div>
           <SidebarLink title="Записи" path="/" Icon={ScissorsIcon} />
           <SidebarLink title="Продажи М" path="/sales" Icon={TagIcon} />
           <SidebarLink title="Краска" path="/paint" Icon={PaintBrushIcon} />
-          <SidebarLink title="Общая касса" path="/shiftgeneral" Icon={CircleStackIcon} />
+          <SidebarLink
+            title="Общая касса"
+            path="/shiftgeneral"
+            Icon={CircleStackIcon}
+          />
         </div>
         <div>
-          <SidebarLink title="Касса" path="/cashbox" Icon={BanknotesIcon} />
+          <SidebarLink
+            title="Отчет о смене"
+            path="/cashbox"
+            Icon={BanknotesIcon}
+          />
           <SidebarLink
             title="Зарплата"
             path="/salary"
             Icon={CurrencyDollarIcon}
           />
         </div>
-        <SidebarLink
-          title="Архив смен"
-          path="/salary"
-          Icon={CalendarDaysIcon}
-        />
+        <div>
+          <SidebarLink
+            title="Мастера"
+            path="/employees"
+            Icon={UserCircleIcon}
+          />
+          <SidebarLink
+            title="Архив смен"
+            path="/archive"
+            Icon={CalendarDaysIcon}
+          />
+        </div>
       </div>
-      <Button type="button" onClick={logout}>
+      <Button
+        type="button"
+        onClick={async () => {
+          const shift = JSON.parse(localStorage.getItem("shift")!);
+          await updateDoc(doc(db, "work shifts", shift.id!), {
+            salesMEndSum:
+              startSumState.salesMStartSum + cashboxState.salesMenTotal,
+            paintEndSum: startSumState.paintStartSum + cashboxState.paintTotal,
+            shiftGeneralEndSum:
+              startSumState.generalShiftStartSum +
+              cashboxState.generalShiftTotal,
+          }),
+            logout();
+        }}
+      >
         Закрыть смену
       </Button>
     </div>

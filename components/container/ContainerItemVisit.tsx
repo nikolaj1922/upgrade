@@ -7,7 +7,8 @@ interface ContainerItemVisitProps {
     id: string,
     paintId?: string,
     employee?: string,
-    value?: number
+    value?: number,
+    paint?: number
   ) => void;
   id: string;
   paintId: string;
@@ -16,6 +17,7 @@ interface ContainerItemVisitProps {
   price: number;
   visitType: string;
   payloadType: string;
+  paint: number;
 }
 
 const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
@@ -27,6 +29,7 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
   visitType,
   handleDeleteItem,
   payloadType,
+  paint,
 }) => {
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
@@ -57,7 +60,7 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
       </div>
       <div className="flex justify-center items-center">
         <XRedCircleButton
-          onClick={() => handleDeleteItem(id, paintId, employee, price)}
+          onClick={() => handleDeleteItem(id, paintId, employee, price, paint)}
           className="ml-7"
         />
       </div>

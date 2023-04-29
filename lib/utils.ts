@@ -6,7 +6,7 @@ export const convertDataToTime = (data: string) => {
   return `${hours}:${minutes}`;
 };
 
-export const getFullDate = (data: string) => {
+export const getFullDate = (data: string, toArchive = false) => {
   const date = new Date(data);
   const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
   const month =
@@ -15,6 +15,8 @@ export const getFullDate = (data: string) => {
   const minutes =
     date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
   const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
+
+  if (toArchive) return `${year}-${month}-${day}`;
 
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
