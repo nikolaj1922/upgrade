@@ -6,7 +6,7 @@ import Router from "next/router";
 import type { AppProps } from "next/app";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Provider } from "react-redux";
-import { store } from "@/redux";
+import { store } from "@/redux/store";
 import { Toaster } from "react-hot-toast";
 import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";

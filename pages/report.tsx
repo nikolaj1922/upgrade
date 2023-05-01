@@ -1,10 +1,10 @@
-import { FC } from "react";
+import React from "react";
 import MainHeader from "@/components/Header";
 import CashBoxAccordion from "@/components/CashBoxAccordion";
 
-interface cashboxProps {}
+interface ReportProps {}
 
-const cashbox: FC<cashboxProps> = ({}) => {
+const Report: React.FC<ReportProps> = ({}) => {
   return (
     <main>
       <MainHeader header="Отчет о смене" />
@@ -13,4 +13,4 @@ const cashbox: FC<cashboxProps> = ({}) => {
   );
 };
 
-export default cashbox;
+export default Report;

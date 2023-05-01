@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from "react";
+import React from "react";
 import {
   CurrencyDollarIcon,
   BanknotesIcon,
@@ -33,22 +33,22 @@ import { useAppSelector } from "@/hooks/useRedux";
 
 interface SidebarProps {}
 
-const Sidebar: FC<SidebarProps> = ({}) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+const Sidebar: React.FC<SidebarProps> = ({}) => {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
   const { logout, admin } = useAuth();
-  const [isChangeName, setIsChangeName] = useState<boolean>(false);
+  const [isChangeName, setIsChangeName] = React.useState<boolean>(false);
   const isMenuOpen = Boolean(anchorEl);
-  const [currentAdminData, setCurrentAdminData] = useState<IAdmin | null>(null);
-  const [currentName, setCurrentName] = useState<string>("");
+  const [currentAdminData, setCurrentAdminData] = React.useState<IAdmin | null>(null);
+  const [currentName, setCurrentName] = React.useState<string>("");
   const [editedNameIsLoading, setEditedNameIsLoading] =
-    useState<boolean>(false);
+  React.useState<boolean>(false);
 
   const { cashboxState, startSumState } = useAppSelector((state) => state);
-  const inputChangeNameRef = useRef<HTMLInputElement | null>(null);
-  const buttonChangeNameRef = useRef<HTMLButtonElement | null>(null);
-  const inputFileRef = useRef<HTMLInputElement | null>(null);
+  const inputChangeNameRef = React.useRef<HTMLInputElement | null>(null);
+  const buttonChangeNameRef = React.useRef<HTMLButtonElement | null>(null);
+  const inputFileRef = React.useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const adminDataSubscribe = () => {
       if (!admin) return;
       onSnapshot(doc(db, "admins", admin?.uid), (snapshot) => {
@@ -220,7 +220,7 @@ const Sidebar: FC<SidebarProps> = ({}) => {
         <div>
           <SidebarLink
             title="Отчет о смене"
-            path="/cashbox"
+            path="/report"
             Icon={BanknotesIcon}
           />
           <SidebarLink

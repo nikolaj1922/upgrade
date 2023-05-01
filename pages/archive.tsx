@@ -1,33 +1,29 @@
 import MainHeader from "@/components/Header";
-import { FC, useState, useEffect } from "react";
+import React from "react";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs, { Dayjs } from "dayjs";
 import { getFullDate } from "@/lib/utils";
-import Container from "@/components/container/Container";
-import {
-  DocumentData,
-  collection,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { IArchiveData } from "@/types/types";
+import { ContainerArchive } from "@/components/container/containers";
 
 interface ArchiveProps {}
 
-const Archive: FC<ArchiveProps> = ({}) => {
-  const [value, setValue] = useState<Dayjs | null>(
+const Archive: React.FC<ArchiveProps> = ({}) => {
+  const [value, setValue] = React.useState<Dayjs | null>(
     dayjs(getFullDate(String(new Date()), true))
   );
-  const [archiveData, setArchiveData] = useState<IArchiveData[] | null>(null);
+  const [archiveData, setArchiveData] = React.useState<IArchiveData[] | null>(
+    null
+  );
 
-  const day = value?.date();
+  const day = value?.date()! < 9 ? `0${value?.date()}` : value?.date();
   const month =
     value?.month()! + 1 < 9 ? `0${value?.month()! + 1}` : value?.month()! + 1;
   const year = value?.year();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getCurrentShiftData = async () => {
       setArchiveData(null);
       const collectionRef = collection(db, "work shifts");
@@ -51,10 +47,7 @@ const Archive: FC<ArchiveProps> = ({}) => {
           value={value}
           onChange={(newValue) => setValue(newValue)}
         />
-        <Container
-          dataType="archive"
-          archiveData={archiveData as IArchiveData[]}
-        />
+        <ContainerArchive archiveData={archiveData as IArchiveData[]} />
       </div>
     </main>
   );

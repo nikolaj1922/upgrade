@@ -1,16 +1,16 @@
-import Container from "@/components/container/Container";
+import React from "react";
 import MainHeader from "@/components/Header";
+import { ContainerSalary } from "@/components/container/containers";
 import { useAppSelector } from "@/hooks/useRedux";
-import { FC } from "react";
 
 interface salaryProps {}
 
-const Salary: FC<salaryProps> = ({}) => {
+const Salary: React.FC<salaryProps> = ({}) => {
   const { salary } = useAppSelector((state) => state.salaryState);
   return (
     <main>
       <MainHeader header="Зарплата" />
-      <Container dataType="salary" salary={salary} />
+      <ContainerSalary salary={salary} />
     </main>
   );
 };

@@ -17,6 +17,17 @@ export interface Event<T = EventTarget> {
 
 export type PayloadType = "total" | "card" | "cash" | "kaspi" | "signIn";
 
+export type DataType =
+  | "visits"
+  | "salesMen"
+  | "salary"
+  | "paint"
+  | "general"
+  | "archive"
+  | "employees";
+
+export type SubFrom = "visits" | "salesMen" | "paint" | "general";
+
 export interface IVisit {
   id: string;
   paintId: string;
@@ -25,7 +36,7 @@ export interface IVisit {
   price: number;
   payloadType: PayloadType;
   timestamp: string;
-  paint: number;
+  paintValue: number;
 }
 
 export interface ISale {

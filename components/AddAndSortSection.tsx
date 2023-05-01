@@ -10,7 +10,7 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { FC, SetStateAction, Dispatch, useState, useRef } from "react";
+import React from "react";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
@@ -24,8 +24,8 @@ import {
 } from "@/redux/slices/startSumStateSlice";
 
 interface AddAndSortSectionProps {
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-  setSortSelect?: Dispatch<SetStateAction<string>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSortSelect?: React.Dispatch<React.SetStateAction<string>>;
   sortItems?: {
     value: string;
     title: string;
@@ -36,7 +36,7 @@ interface AddAndSortSectionProps {
   updateDocKey?: "salesM" | "paint" | "shiftGeneral";
 }
 
-const AddAndSortSection: FC<AddAndSortSectionProps> = ({
+const AddAndSortSection: React.FC<AddAndSortSectionProps> = ({
   setIsModalOpen,
   setSortSelect,
   sortItems,
@@ -48,10 +48,10 @@ const AddAndSortSection: FC<AddAndSortSectionProps> = ({
   const handleSetSelect = (e: SelectChangeEvent) => {
     if (setSortSelect) setSortSelect(e.target.value);
   };
-  const [isChangeSum, setIsChangeSum] = useState<boolean>(false);
-  const [currentSum, setCurrentSum] = useState<number>(0);
-  const buttonChangeSumRef = useRef<HTMLButtonElement | null>(null);
-  const inputChangeSumRef = useRef<HTMLInputElement | null>(null);
+  const [isChangeSum, setIsChangeSum] = React.useState<boolean>(false);
+  const [currentSum, setCurrentSum] = React.useState<number>(0);
+  const buttonChangeSumRef = React.useRef<HTMLButtonElement | null>(null);
+  const inputChangeSumRef = React.useRef<HTMLInputElement | null>(null);
   const dispatch = useAppDispatch();
   const { shiftId } = useAppSelector((state) => state.shiftState);
 

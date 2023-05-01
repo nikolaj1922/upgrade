@@ -1,23 +1,22 @@
+import React from "react";
 import AddAndSortSection from "@/components/AddAndSortSection";
 import MainHeader from "@/components/Header";
-import Container from "@/components/container/Container";
 import PaintModal from "@/components/modals/PaintModal";
 import { useAppSelector } from "@/hooks/useRedux";
 import { db } from "@/lib/firebase";
 import { IPaint } from "@/types/types";
 import { doc, onSnapshot } from "firebase/firestore";
-import { FC, useState, useEffect } from "react";
 import { setPaintStartSum } from "@/redux/slices/startSumStateSlice";
+import { ContainerPaint } from "@/components/container/containers";
 
 interface DyeProps {}
 
-const Paint: FC<DyeProps> = ({}) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [sortSelect, setSortSelect] = useState<string>("");
+const Paint: React.FC<DyeProps> = ({}) => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [sortSelect, setSortSelect] = React.useState<string>("");
   const { shiftId } = useAppSelector((state) => state.shiftState);
-  const [paint, setPaint] = useState<IPaint[] | null>(null);
+  const [paint, setPaint] = React.useState<IPaint[] | null>(null);
   const { paintStartSum } = useAppSelector((state) => state.startSumState);
-
   const sortData = [
     { value: "", title: "Не выбрано" },
     {
@@ -38,7 +37,7 @@ const Paint: FC<DyeProps> = ({}) => {
     return paint;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const paintSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
@@ -68,11 +67,7 @@ const Paint: FC<DyeProps> = ({}) => {
         setStartSum={setPaintStartSum}
         updateDocKey="paint"
       />
-      <Container
-        dataType="paint"
-        paint={paint as IPaint[]}
-        checkedSum={paintStartSum}
-      />
+      <ContainerPaint paint={paint as IPaint[]} checkedSum={paintStartSum} />
       {isModalOpen && (
         <PaintModal
           isModalOpen={isModalOpen}

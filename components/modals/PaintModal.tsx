@@ -1,4 +1,4 @@
-import { FC, useState, SetStateAction, Dispatch, useEffect } from "react";
+import React from "react";
 import { db } from "@/lib/firebase";
 import { useForm } from "react-hook-form";
 import {
@@ -29,17 +29,17 @@ type FormData = {
 
 interface PaintModalProps {
   isModalOpen: boolean;
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   shiftId: string | null;
 }
 
-const PaintModal: FC<PaintModalProps> = ({
+const PaintModal: React.FC<PaintModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
 }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validateFormState, setValidateFormState] = useState<{
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [validateFormState, setValidateFormState] = React.useState<{
     titleState: string;
     priceState: string;
     payloadTypeState: string;

@@ -1,20 +1,22 @@
-import { FC, useEffect, useState } from "react";
+import React from "react";
 import { DocumentData, doc, onSnapshot } from "firebase/firestore";
 import { ISale } from "@/types/types";
 import { db } from "@/lib/firebase";
 import { useAppSelector } from "@/hooks/useRedux";
 import MainHeader from "@/components/Header";
 import AddAndSortSection from "@/components/AddAndSortSection";
-import Container from "@/components/container/Container";
 import SaleModal from "@/components/modals/SaleModal";
 import { setSalesMStartSum } from "@/redux/slices/startSumStateSlice";
+import {
+  ContainerSale,
+} from "@/components/container/containers";
 
 interface salesProps {}
 
-const Sales: FC<salesProps> = ({}) => {
-  const [sales, setSales] = useState<ISale[] | DocumentData[] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [sortSelect, setSortSelect] = useState<string>("");
+const Sales: React.FC<salesProps> = ({}) => {
+  const [sales, setSales] = React.useState<ISale[] | DocumentData[] | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [sortSelect, setSortSelect] = React.useState<string>("");
   const sortData = [
     { value: "", title: "Не выбрано" },
     {
@@ -44,7 +46,7 @@ const Sales: FC<salesProps> = ({}) => {
     return sales;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const salesSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
@@ -75,7 +77,7 @@ const Sales: FC<salesProps> = ({}) => {
         setStartSum={setSalesMStartSum}
         updateDocKey="salesM"
       />
-      <Container dataType="salesMen" salesMen={sales as ISale[]} checkedSum={salesMStartSum} />
+      <ContainerSale salesMen={sales as ISale[]} checkedSum={salesMStartSum} />
       {isModalOpen && (
         <SaleModal
           isModalOpen={isModalOpen}

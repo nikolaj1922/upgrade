@@ -1,7 +1,7 @@
+import React from "react";
 import { db } from "@/lib/firebase";
 import { IArchiveData } from "@/types/types";
 import { collection, onSnapshot } from "firebase/firestore";
-import { FC, useEffect, useState } from "react";
 import { IAdmin } from "@/types/types";
 import { getFullDate } from "@/lib/utils";
 
@@ -9,10 +9,10 @@ interface ContainerArchiveProps {
   data: IArchiveData;
 }
 
-const ContainerArchive: FC<ContainerArchiveProps> = ({ data }) => {
-  const [allAdmins, setAllAdmins] = useState<IAdmin[] | null>(null);
+const ContainerItemArchive: React.FC<ContainerArchiveProps> = ({ data }) => {
+  const [allAdmins, setAllAdmins] = React.useState<IAdmin[] | null>(null);
 
-  useEffect(
+  React.useEffect(
     () =>
       onSnapshot(collection(db, "admins"), (snapshot) => {
         setAllAdmins(snapshot.docs.map((doc) => doc.data() as IAdmin));
@@ -164,4 +164,4 @@ const ContainerArchive: FC<ContainerArchiveProps> = ({ data }) => {
   );
 };
 
-export default ContainerArchive;
+export default ContainerItemArchive;

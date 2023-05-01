@@ -1,21 +1,20 @@
-import { FC } from "react";
-import { payloadTypeFormat } from "@/lib/utils";
-import XRedCircleButton from "../ui/XRedCircleButton";
+import React from "react";
+import XRedCircleButton from "../../ui/XRedCircleButton";
 
 interface ContainerItemGeneralProps {
-  handleDeleteItem: (id: string) => void;
   id: string;
   title: string;
   price: number;
   timestamp: string;
+  handleDeleteGeneral: (id: string) => void;
 }
 
-const ContainerItemGeneral: FC<ContainerItemGeneralProps> = ({
-  handleDeleteItem,
+const ContainerItemGeneral: React.FC<ContainerItemGeneralProps> = ({
   id,
   timestamp,
   title,
   price,
+  handleDeleteGeneral,
 }) => {
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
@@ -34,7 +33,7 @@ const ContainerItemGeneral: FC<ContainerItemGeneralProps> = ({
       </div>
       <div className="flex justify-center items-center">
         <XRedCircleButton
-          onClick={() => handleDeleteItem(id)}
+          onClick={() => handleDeleteGeneral(id)}
           className="ml-7"
         />
       </div>

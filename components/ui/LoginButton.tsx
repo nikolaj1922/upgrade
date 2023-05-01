@@ -1,11 +1,11 @@
-import { ButtonHTMLAttributes, FC, ReactNode } from "react";
+import React from "react";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
   isLoading?: boolean;
 }
 
-const LoginButton: FC<ButtonProps> = ({
+const LoginButton: React.FC<ButtonProps> = ({
   children,
   className,
   isLoading,

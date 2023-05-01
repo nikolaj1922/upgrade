@@ -1,10 +1,10 @@
 import { XCircleIcon } from "@heroicons/react/24/solid";
-import { FC, ButtonHTMLAttributes } from "react";
+import React from "react";
 
 interface XRedCircleButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
-const XRedCircleButton: FC<XRedCircleButtonProps> = ({
+const XRedCircleButton: React.FC<XRedCircleButtonProps> = ({
   className,
   ...props
 }) => {

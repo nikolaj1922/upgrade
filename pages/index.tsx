@@ -1,20 +1,20 @@
-import { FC, useState, useEffect } from "react";
+import React from "react";
 import { DocumentData, doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { IPaint, IVisit } from "@/types/types";
 import { useAppSelector } from "@/hooks/useRedux";
 import MainHeader from "@/components/Header";
-import Container from "@/components/container/Container";
 import VisitModal from "@/components/modals/VisitModal";
 import AddAndSortSection from "@/components/AddAndSortSection";
+import ContainerVisits from "@/components/container/containers/ContainerVisits";
 
 interface ServicesProps {}
 
-const Visits: FC<ServicesProps> = ({}) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [visits, setVisits] = useState<IVisit[] | DocumentData[] | null>(null);
-  const [sortSelect, setSortSelect] = useState<string>("");
-  const [paint, setPaint] = useState<IPaint[] | null>(null);
+const Visits: React.FC<ServicesProps> = ({}) => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [visits, setVisits] = React.useState<IVisit[] | DocumentData[] | null>(null);
+  const [sortSelect, setSortSelect] = React.useState<string>("");
+  const [paint, setPaint] = React.useState<IPaint[] | null>(null);
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const sortData = [
     { value: "", title: "Не выбрано" },
@@ -45,7 +45,7 @@ const Visits: FC<ServicesProps> = ({}) => {
     return visits;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const paintSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
@@ -60,7 +60,7 @@ const Visits: FC<ServicesProps> = ({}) => {
     return () => paintSubscribe();
   }, [db, shiftId, sortSelect]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const worksShiftSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
@@ -86,11 +86,7 @@ const Visits: FC<ServicesProps> = ({}) => {
         setSortSelect={setSortSelect}
         sortItems={sortData}
       />
-      <Container
-        visits={visits as IVisit[]}
-        paint={paint as IPaint[]}
-        dataType="visits"
-      />
+      <ContainerVisits visits={visits as IVisit[]} paint={paint as IPaint[]} />
       {isModalOpen && (
         <VisitModal
           isModalOpen={isModalOpen}

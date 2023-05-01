@@ -5,16 +5,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { useRouter } from "next/router";
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  useCallback,
-  FC,
-} from "react";
+import React from "react";
 import { auth, db } from "../lib/firebase";
 import { FirebaseError } from "firebase/app";
 import {
@@ -23,7 +14,6 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc,
 } from "firebase/firestore";
 import {
   IAdmin,
@@ -34,7 +24,7 @@ import {
   IVisit,
 } from "@/types/types";
 import { setShift, clearShift } from "@/redux/slices/shiftStateSlice";
-import { useAppDispatch, useAppSelector } from "./useRedux";
+import { useAppDispatch } from "./useRedux";
 import toast from "react-hot-toast";
 import {
   initGeneralShift,
@@ -59,7 +49,7 @@ export interface IAuth {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<IAuth>({
+const AuthContext = React.createContext<IAuth>({
   admin: null,
   signIn: async () => {},
   signUp: async () => {},
@@ -67,10 +57,10 @@ const AuthContext = createContext<IAuth>({
   isLoading: false,
 });
 
-export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [admin, setAdmin] = useState<IAdmin | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [initialLoading, setInitialLoading] = useState<boolean>(true);
+export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [admin, setAdmin] = React.useState<IAdmin | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = React.useState<boolean>(true);
   const dispatch = useAppDispatch();
   const router = useRouter();
   
@@ -88,7 +78,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       const salary: Array<ISalary> = visits.map((visit) => ({
         employee: visit.employee,
         revenue: visit.price,
-        paint: visit.paint,
+        paint: visit.paintValue,
       }));
       dispatch(initSalary(salary));
       dispatch(setPaintStartSum(paintStartSum!));
@@ -192,11 +182,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       dispatch(
         initEmployeeSalaryPaint(
           visits
-            .filter((visit) => visit.paint > 0)
+            .filter((visit) => visit.paintValue > 0)
             .map((visit) => ({
               id: visit.paintId,
               employee: visit.employee,
-              value: +visit.paint,
+              value: +visit.paintValue,
             }))
         )
       );
@@ -230,7 +220,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     dispatch(initSalary([]));
   };
 
-  useEffect(
+  React.useEffect(
     () =>
       onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -263,7 +253,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     [auth]
   );
 
-  const signUp = useCallback(
+  const signUp = React.useCallback(
     async (email: string, password: string, name: string) => {
       try {
         setIsLoading(true);
@@ -328,7 +318,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     []
   );
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = React.useCallback(async (email: string, password: string) => {
     try {
       setIsLoading(true);
       const { user } = await signInWithEmailAndPassword(auth, email, password);
@@ -376,7 +366,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const logout = useCallback(async () => {
+  const logout = React.useCallback(async () => {
     try {
       setIsLoading(true);
       await signOut(auth);
@@ -394,7 +384,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const memoedValue = useMemo(
+  const memoedValue = React.useMemo(
     () => ({
       admin,
       signIn,
@@ -413,5 +403,5 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 };
 
 export default function useAuth() {
-  return useContext(AuthContext);
+  return React.useContext(AuthContext);
 }

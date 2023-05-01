@@ -1,4 +1,4 @@
-import { FC, useState, SetStateAction, Dispatch } from "react";
+import React from "react";
 import { db } from "@/lib/firebase";
 import { useForm } from "react-hook-form";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
@@ -19,17 +19,17 @@ type FormData = {
 
 interface SaleModalProps {
   isModalOpen: boolean;
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   shiftId: string | null;
 }
 
-const GeneralShiftModal: FC<SaleModalProps> = ({
+const GeneralShiftModal: React.FC<SaleModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
 }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validateFormState, setValidateFormState] = useState<{
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [validateFormState, setValidateFormState] = React.useState<{
     titleState: string;
     priceState: string;
   }>({

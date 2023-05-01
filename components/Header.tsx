@@ -1,13 +1,13 @@
-import { FC, AllHTMLAttributes } from "react";
+import React from "react";
 import { useAppSelector } from "@/hooks/useRedux";
 import { getFullDate } from "@/lib/utils";
 
-interface HeaderProps extends AllHTMLAttributes<HTMLHeadingElement> {
+interface HeaderProps extends React.AllHTMLAttributes<HTMLHeadingElement> {
   header: string;
   isModal?: boolean;
 }
 
-const MainHeader: FC<HeaderProps> = ({ header, className, isModal }) => {
+const MainHeader: React.FC<HeaderProps> = ({ header, className, isModal }) => {
   const { timestamp } = useAppSelector((state) => state.shiftState);
 
   return (

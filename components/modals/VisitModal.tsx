@@ -1,4 +1,4 @@
-import { FC, useState, SetStateAction, Dispatch, useEffect } from "react";
+import React from "react";
 import { DocumentData, collection, onSnapshot } from "firebase/firestore";
 import { IEmployee, PayloadType } from "@/types/types";
 import { db } from "@/lib/firebase";
@@ -31,20 +31,20 @@ type FormData = {
 
 interface VisitModalProps {
   isModalOpen: boolean;
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   shiftId: string | null;
 }
 
-const VisitModal: FC<VisitModalProps> = ({
+const VisitModal: React.FC<VisitModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   shiftId,
 }) => {
-  const [allEmployees, setAllEmployees] = useState<
+  const [allEmployees, setAllEmployees] = React.useState<
     IEmployee[] | DocumentData[]
   >([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validateFormState, setValidateFormState] = useState<{
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [validateFormState, setValidateFormState] = React.useState<{
     employeeState: string;
     visitTypeState: string;
     priceState: string;
@@ -60,7 +60,7 @@ const VisitModal: FC<VisitModalProps> = ({
   const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm<FormData>();
 
-  useEffect(
+  React.useEffect(
     () =>
       onSnapshot(collection(db, "employees"), (snapshot) =>
         setAllEmployees(snapshot.docs.map((doc) => doc.data()))

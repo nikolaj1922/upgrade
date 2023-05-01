@@ -1,10 +1,10 @@
 import Image from "next/image";
 import bg from "@/public/upgrade_bg.jpg";
-import { FC } from "react";
+import React from "react";
 
 interface BackgroundProps {}
 
-const Background: FC<BackgroundProps> = ({}) => {
+const Background: React.FC<BackgroundProps> = ({}) => {
   return (
     <div className="absolute h-full w-full -z-50">
       <Image

@@ -1,25 +1,27 @@
 import AddAndSortSection from "@/components/AddAndSortSection";
 import MainHeader from "@/components/Header";
-import Container from "@/components/container/Container";
 import GeneralShiftModal from "@/components/modals/GeneralShiftModal";
 import { useAppSelector } from "@/hooks/useRedux";
 import { db } from "@/lib/firebase";
 import { IGeneral } from "@/types/types";
 import { doc, onSnapshot } from "firebase/firestore";
-import { FC, useState, useEffect } from "react";
+import React from "react";
 import { setGeneralShiftStartSum } from "@/redux/slices/startSumStateSlice";
+import { ContainerGeneral } from "@/components/container/containers";
 
 interface ShiftGeneralProps {}
 
-const ShiftGeneral: FC<ShiftGeneralProps> = ({}) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [generalShift, setGeneralShift] = useState<IGeneral[] | null>(null);
+const ShiftGeneral: React.FC<ShiftGeneralProps> = ({}) => {
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [generalShift, setGeneralShift] = React.useState<IGeneral[] | null>(
+    null
+  );
   const { shiftId } = useAppSelector((state) => state.shiftState);
   const { generalShiftStartSum } = useAppSelector(
     (state) => state.startSumState
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const generalShiftSubscribe = () => {
       if (!shiftId) return;
       onSnapshot(doc(db, "work shifts", shiftId), (snapshot) => {
@@ -44,8 +46,7 @@ const ShiftGeneral: FC<ShiftGeneralProps> = ({}) => {
         startSum={generalShiftStartSum}
         updateDocKey="shiftGeneral"
       />
-      <Container
-        dataType="general"
+      <ContainerGeneral
         generalShift={generalShift as IGeneral[]}
         checkedSum={generalShiftStartSum}
       />

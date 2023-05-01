@@ -1,15 +1,8 @@
 import { FC } from "react";
-import XRedCircleButton from "../ui/XRedCircleButton";
+import XRedCircleButton from "../../ui/XRedCircleButton";
 import { payloadTypeFormat } from "@/lib/utils";
 
 interface ContainerItemVisitProps {
-  handleDeleteItem: (
-    id: string,
-    paintId?: string,
-    employee?: string,
-    value?: number,
-    paint?: number
-  ) => void;
   id: string;
   paintId: string;
   employee: string;
@@ -17,7 +10,14 @@ interface ContainerItemVisitProps {
   price: number;
   visitType: string;
   payloadType: string;
-  paint: number;
+  paintValue: number;
+  handleDeleteVisit: (
+    id: string,
+    paintId: string,
+    employee: string,
+    value: number,
+    paintValue: number
+  ) => void;
 }
 
 const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
@@ -27,9 +27,9 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
   timestamp,
   price,
   visitType,
-  handleDeleteItem,
   payloadType,
-  paint,
+  paintValue,
+  handleDeleteVisit,
 }) => {
   return (
     <div className="bg-gray-100 hover:bg-gray-200 p-2 rounded-md transition duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
@@ -60,7 +60,9 @@ const ContainerItemVisit: FC<ContainerItemVisitProps> = ({
       </div>
       <div className="flex justify-center items-center">
         <XRedCircleButton
-          onClick={() => handleDeleteItem(id, paintId, employee, price, paint)}
+          onClick={() =>
+            handleDeleteVisit(id, paintId, employee, price, paintValue)
+          }
           className="ml-7"
         />
       </div>

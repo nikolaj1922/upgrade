@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import logo from "@/public/logo.png";
@@ -16,7 +16,7 @@ type FormValues = {
   password: string;
 };
 
-const LoginForm: FC<LoginFormProps> = () => {
+const LoginForm: React.FC<LoginFormProps> = () => {
   const { signIn, isLoading } = useAuth();
   const dispatch = useAppDispatch();
   const {

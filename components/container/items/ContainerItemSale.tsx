@@ -1,9 +1,9 @@
 import { FC } from "react";
 import { payloadTypeFormat } from "@/lib/utils";
-import XRedCircleButton from "../ui/XRedCircleButton";
+import XRedCircleButton from "../../ui/XRedCircleButton";
 
 interface ContainerItemSaleProps {
-  handleDeleteItem: (id: string) => void;
+  handleDeleteSale: (id: string) => void;
   id: string;
   title: string;
   price: number;
@@ -12,7 +12,7 @@ interface ContainerItemSaleProps {
 }
 
 const ContainerItemSale: FC<ContainerItemSaleProps> = ({
-  handleDeleteItem,
+  handleDeleteSale,
   id,
   timestamp,
   title,
@@ -42,7 +42,7 @@ const ContainerItemSale: FC<ContainerItemSaleProps> = ({
       </div>
       <div className="flex justify-center items-center">
         <XRedCircleButton
-          onClick={() => handleDeleteItem(id)}
+          onClick={() => handleDeleteSale(id)}
           className="ml-7"
         />
       </div>

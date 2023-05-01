@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FC } from "react";
+import React from "react";
 
 interface SidebarLinkProps {
   title: string;
@@ -12,7 +12,7 @@ interface SidebarLinkProps {
   >;
 }
 
-const SidebarLink: FC<SidebarLinkProps> = ({ title, Icon, path }) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ({ title, Icon, path }) => {
   return (
     <Link href={`${path}`}>
       <div className="flex items-center hover:bg-gray-300 pl-4 pr-6 py-1 rounded-md transition duration-150">
