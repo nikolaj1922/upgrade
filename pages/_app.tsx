@@ -6,12 +6,13 @@ import Router from "next/router";
 import type { AppProps } from "next/app";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Provider } from "react-redux";
-import { store } from "@/redux/store";
+import { store, persistor } from "@/redux/store";
 import { Toaster } from "react-hot-toast";
 import { NextPage } from "next";
 import { ReactElement, ReactNode } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { PersistGate } from "redux-persist/integration/react";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -39,16 +40,18 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <Toaster position="top-center" reverseOrder={false} />
         <Background />
         <Provider store={store}>
-          <AuthProvider>
-            {Component.getLayout ? (
-              <Component {...pageProps} />
-            ) : (
-              <div className="w-[80%] h-[600px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
-                <Sidebar />
+          <PersistGate loading={null} persistor={persistor}>
+            <AuthProvider>
+              {Component.getLayout ? (
                 <Component {...pageProps} />
-              </div>
-            )}
-          </AuthProvider>
+              ) : (
+                <div className="w-[85%] h-[630px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-8">
+                  <Sidebar />
+                  <Component {...pageProps} />
+                </div>
+              )}
+            </AuthProvider>
+          </PersistGate>
         </Provider>
       </LocalizationProvider>
     </div>

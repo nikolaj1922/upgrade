@@ -38,10 +38,12 @@ const Sidebar: React.FC<SidebarProps> = ({}) => {
   const { logout, admin } = useAuth();
   const [isChangeName, setIsChangeName] = React.useState<boolean>(false);
   const isMenuOpen = Boolean(anchorEl);
-  const [currentAdminData, setCurrentAdminData] = React.useState<IAdmin | null>(null);
+  const [currentAdminData, setCurrentAdminData] = React.useState<IAdmin | null>(
+    null
+  );
   const [currentName, setCurrentName] = React.useState<string>("");
   const [editedNameIsLoading, setEditedNameIsLoading] =
-  React.useState<boolean>(false);
+    React.useState<boolean>(false);
 
   const { cashboxState, startSumState } = useAppSelector((state) => state);
   const inputChangeNameRef = React.useRef<HTMLInputElement | null>(null);
@@ -145,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({}) => {
   };
 
   return (
-    <div className="min-w-[200px] bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative px-2">
+    <div className="min-w-[210px] bg-zinc-200/97 rounded-md pt-8 flex flex-col justify-start items-center relative px-2">
       <div className="flex flex-col items-center mb-4">
         <Avatar
           src={currentAdminData?.avatarUrl}

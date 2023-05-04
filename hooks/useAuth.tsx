@@ -8,13 +8,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { auth, db } from "../lib/firebase";
 import { FirebaseError } from "firebase/app";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-} from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 import {
   IAdmin,
   IGeneral,
@@ -57,141 +51,142 @@ const AuthContext = React.createContext<IAuth>({
   isLoading: false,
 });
 
-export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const AuthProvider: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const [admin, setAdmin] = React.useState<IAdmin | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [initialLoading, setInitialLoading] = React.useState<boolean>(true);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  
 
-  const initCashState = (
-    visits?: IVisit[],
-    salesMen?: ISale[],
-    paint?: IPaint[],
-    generalShift?: IGeneral[],
-    paintStartSum?: number,
-    salesMStartSum?: number,
-    shiftGeneralStartSum?: number
-  ) => {
-    if (visits && salesMen && paint && generalShift) {
-      const salary: Array<ISalary> = visits.map((visit) => ({
-        employee: visit.employee,
-        revenue: visit.price,
-        paint: visit.paintValue,
-      }));
-      dispatch(initSalary(salary));
-      dispatch(setPaintStartSum(paintStartSum!));
-      dispatch(setSalesMStartSum(salesMStartSum!));
-      dispatch(setGeneralShiftStartSum(shiftGeneralStartSum!));
-      dispatch(
-        initGeneralShift(
-          generalShift.reduce((acc, general) => +general.price + acc, 0)
-        )
-      );
-      dispatch(
-        initVisits({
-          type: "total",
-          value: visits.reduce((acc, visit) => +visit.price + acc, 0),
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "card",
-          value: visits
-            .filter((visit) => visit.payloadType === "card")
-            .reduce((acc, visit) => +visit.price + acc, 0),
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "cash",
-          value: visits
-            .filter((visit) => visit.payloadType === "cash")
-            .reduce((acc, visit) => +visit.price + acc, 0),
-        })
-      );
-      dispatch(
-        initVisits({
-          type: "kaspi",
-          value: visits
-            .filter((visit) => visit.payloadType === "kaspi")
-            .reduce((acc, visit) => +visit.price + acc, 0),
-        })
-      );
-      dispatch(
-        initSalesMen({
-          type: "total",
-          value: salesMen.reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initSalesMen({
-          type: "card",
-          value: salesMen
-            .filter((sale) => sale.payloadType === "card")
-            .reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initSalesMen({
-          type: "cash",
-          value: salesMen
-            .filter((sale) => sale.payloadType === "cash")
-            .reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initSalesMen({
-          type: "kaspi",
-          value: salesMen
-            .filter((sale) => sale.payloadType === "kaspi")
-            .reduce((acc, sale) => +sale.price + acc, 0),
-        })
-      );
-      dispatch(
-        initPaint({
-          type: "total",
-          value: paint.reduce((acc, paint) => +paint.price + acc, 0),
-        })
-      );
-      dispatch(
-        initPaint({
-          type: "card",
-          value: paint
-            .filter((paint) => paint.payloadType === "card")
-            .reduce((acc, paint) => +paint.price + acc, 0),
-        })
-      );
-      dispatch(
-        initPaint({
-          type: "cash",
-          value: paint
-            .filter((paint) => paint.payloadType === "cash")
-            .reduce((acc, paint) => +paint.price + acc, 0),
-        })
-      );
-      dispatch(
-        initPaint({
-          type: "kaspi",
-          value: paint
-            .filter((paint) => paint.payloadType === "kaspi")
-            .reduce((acc, paint) => +paint.price + acc, 0),
-        })
-      );
-      dispatch(
-        initEmployeeSalaryPaint(
-          visits
-            .filter((visit) => visit.paintValue > 0)
-            .map((visit) => ({
-              id: visit.paintId,
-              employee: visit.employee,
-              value: +visit.paintValue,
-            }))
-        )
-      );
-    }
-  };
+  // const initCashState = (
+  //   visits?: IVisit[],
+  //   salesMen?: ISale[],
+  //   paint?: IPaint[],
+  //   generalShift?: IGeneral[],
+  //   paintStartSum?: number,
+  //   salesMStartSum?: number,
+  //   shiftGeneralStartSum?: number
+  // ) => {
+  //   if (visits && salesMen && paint && generalShift) {
+  //     const salary: Array<ISalary> = visits.map((visit) => ({
+  //       employee: visit.employee,
+  //       revenue: visit.price,
+  //       paint: visit.paintValue,
+  //     }));
+  //     dispatch(initSalary(salary));
+  //     dispatch(setPaintStartSum(paintStartSum!));
+  //     dispatch(setSalesMStartSum(salesMStartSum!));
+  //     dispatch(setGeneralShiftStartSum(shiftGeneralStartSum!));
+  //     dispatch(
+  //       initGeneralShift(
+  //         generalShift.reduce((acc, general) => +general.price + acc, 0)
+  //       )
+  //     );
+  //     dispatch(
+  //       initVisits({
+  //         type: "total",
+  //         value: visits.reduce((acc, visit) => +visit.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initVisits({
+  //         type: "card",
+  //         value: visits
+  //           .filter((visit) => visit.payloadType === "card")
+  //           .reduce((acc, visit) => +visit.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initVisits({
+  //         type: "cash",
+  //         value: visits
+  //           .filter((visit) => visit.payloadType === "cash")
+  //           .reduce((acc, visit) => +visit.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initVisits({
+  //         type: "kaspi",
+  //         value: visits
+  //           .filter((visit) => visit.payloadType === "kaspi")
+  //           .reduce((acc, visit) => +visit.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initSalesMen({
+  //         type: "total",
+  //         value: salesMen.reduce((acc, sale) => +sale.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initSalesMen({
+  //         type: "card",
+  //         value: salesMen
+  //           .filter((sale) => sale.payloadType === "card")
+  //           .reduce((acc, sale) => +sale.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initSalesMen({
+  //         type: "cash",
+  //         value: salesMen
+  //           .filter((sale) => sale.payloadType === "cash")
+  //           .reduce((acc, sale) => +sale.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initSalesMen({
+  //         type: "kaspi",
+  //         value: salesMen
+  //           .filter((sale) => sale.payloadType === "kaspi")
+  //           .reduce((acc, sale) => +sale.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initPaint({
+  //         type: "total",
+  //         value: paint.reduce((acc, paint) => +paint.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initPaint({
+  //         type: "card",
+  //         value: paint
+  //           .filter((paint) => paint.payloadType === "card")
+  //           .reduce((acc, paint) => +paint.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initPaint({
+  //         type: "cash",
+  //         value: paint
+  //           .filter((paint) => paint.payloadType === "cash")
+  //           .reduce((acc, paint) => +paint.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initPaint({
+  //         type: "kaspi",
+  //         value: paint
+  //           .filter((paint) => paint.payloadType === "kaspi")
+  //           .reduce((acc, paint) => +paint.price + acc, 0),
+  //       })
+  //     );
+  //     dispatch(
+  //       initEmployeeSalaryPaint(
+  //         visits
+  //           .filter((visit) => visit.paintValue > 0)
+  //           .map((visit) => ({
+  //             id: visit.paintId,
+  //             employee: visit.employee,
+  //             value: +visit.paintValue,
+  //           }))
+  //       )
+  //     );
+  //   }
+  // };
 
   const clearCashState = () => {
     dispatch(initGeneralShift(0));
@@ -233,15 +228,15 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
             );
             const shiftDoc = await getDoc(doc(db, "work shifts", shift.id));
             const shiftParsedDoc = shiftDoc.data();
-            initCashState(
-              shiftParsedDoc?.visits as IVisit[],
-              shiftParsedDoc?.salesMen as ISale[],
-              shiftParsedDoc?.paint as IPaint[],
-              shiftParsedDoc?.generalShift as IGeneral[],
-              shiftParsedDoc?.paintStartSum,
-              shiftParsedDoc?.salesMStartSum,
-              shiftParsedDoc?.shiftGeneralStartSum
-            );
+            // initCashState(
+            //   shiftParsedDoc?.visits as IVisit[],
+            //   shiftParsedDoc?.salesMen as ISale[],
+            //   shiftParsedDoc?.paint as IPaint[],
+            //   shiftParsedDoc?.generalShift as IGeneral[],
+            //   shiftParsedDoc?.paintStartSum,
+            //   shiftParsedDoc?.salesMStartSum,
+            //   shiftParsedDoc?.shiftGeneralStartSum
+            // );
           }
         } else {
           setAdmin(null);
